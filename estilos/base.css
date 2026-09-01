@@ -1,0 +1,250 @@
+/* ==========================================================
+   base.css - Identidad Petromark SRL
+   ========================================================== */
+
+:root {
+  --fondo:            #201913;
+  --superficie:       #2A211A;
+  --superficie-alta:  #342A21;
+  --borde:            #3E3227;
+  --borde-suave:      #332A21;
+  --acento:           #4DA9CE;
+  --acento-oscuro:    #2F7D9C;
+  --acento-tenue:     rgba(77, 169, 206, 0.12);
+  --texto:            #FFFFFF;
+  --texto-medio:      #C9BFB4;
+  --texto-tenue:      #8C8073;
+
+  --ok:               #5FB37A;
+  --alerta:           #D9A32B;
+  --error:            #D9603F;
+  --neutro:           #7C8894;
+
+  --fuente: "Segoe UI", "Segoe UI Variable", Tahoma, Verdana, sans-serif;
+  --fuente-mono: Consolas, "Courier New", monospace;
+
+  --radio: 4px;
+  --radio-g: 6px;
+  --alto-cabecera: 60px;
+  --ancho-nav: 216px;
+  --sombra: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+h1 { font-size: 19px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+
+p { margin: 0 0 10px; }
+
+a {
+  color: var(--acento);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+code, pre, .mono { font-family: var(--fuente-mono); }
+
+::selection { background: var(--acento); color: #10100D; }
+
+:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* ---------- Barras de scroll ---------- */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--fondo); }
+::-webkit-scrollbar-thumb {
+  background: #453729;
+  border-radius: 6px;
+  border: 2px solid var(--fondo);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--acento-oscuro); }
+
+/* ---------- Pantalla de carga ---------- */
+.pantalla-carga {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--fondo);
+  z-index: 200;
+}
+.pantalla-carga img { opacity: 0.9; }
+.pantalla-carga p {
+  color: var(--texto-tenue);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ---------- Estructura de la aplicacion ---------- */
+.app { min-height: 100%; }
+
+.marco {
+  display: grid;
+  grid-template-columns: var(--ancho-nav) 1fr;
+  grid-template-rows: var(--alto-cabecera) 1fr;
+  grid-template-areas: "cabecera cabecera" "nav contenido";
+  min-height: 100vh;
+}
+
+.cabecera {
+  grid-area: cabecera;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+}
+.cabecera-marca {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.cabecera-marca img { width: 30px; height: 30px; }
+.cabecera-marca .nombre {
+  font-size: 15px;
+  font-weight: 600;
+}
+.cabecera-marca .sub {
+  font-size: 11px;
+  color: var(--texto-tenue);
+  letter-spacing: 0.6px;
+}
+.cabecera-espacio { flex: 1; }
+.cabecera-usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cabecera-usuario .datos { text-align: right; line-height: 1.25; }
+.cabecera-usuario .datos .n { font-size: 13px; }
+.cabecera-usuario .datos .r { font-size: 11px; color: var(--acento); }
+.inicial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--acento-tenue);
+  border: 1px solid var(--acento-oscuro);
+  color: var(--acento);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.nav {
+  grid-area: nav;
+  background: var(--superficie);
+  border-right: 1px solid var(--borde);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--radio) var(--radio) 0;
+  background: transparent;
+  color: var(--texto-medio);
+  font-family: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.nav button:hover { background: var(--superficie-alta); color: var(--texto); }
+.nav button.activo {
+  background: var(--acento-tenue);
+  border-left-color: var(--acento);
+  color: var(--texto);
+  font-weight: 600;
+}
+.nav .separador {
+  margin: 10px 11px 6px;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  color: var(--texto-tenue);
+}
+.nav .pie {
+  margin-top: auto;
+  padding: 10px 11px 0;
+  font-size: 11px;
+  color: var(--texto-tenue);
+  border-top: 1px solid var(--borde-suave);
+}
+
+.contenido {
+  grid-area: contenido;
+  padding: 20px 24px 40px;
+  min-width: 0;
+}
+
+.cabecera-vista {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.cabecera-vista .descripcion {
+  color: var(--texto-tenue);
+  font-size: 12.5px;
+  margin: 3px 0 0;
+}
+.cabecera-vista .acciones { margin-left: auto; display: flex; gap: 8px; }
+
+@media (max-width: 860px) {
+  .marco {
+    grid-template-columns: 1fr;
+    grid-template-areas: "cabecera" "nav" "contenido";
+  }
+  .nav {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--borde);
+    padding: 8px;
+  }
+  .nav button { width: auto; white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; border-radius: var(--radio); }
+  .nav button.activo { border-left: 0; border-bottom-color: var(--acento); }
+  .nav .separador, .nav .pie { display: none; }
+  .contenido { padding: 16px 14px 32px; }
+  .cabecera-marca .sub { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

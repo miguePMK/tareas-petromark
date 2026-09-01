@@ -1,0 +1,270 @@
+/* ==========================================================
+   layout.js - Marco de la aplicacion, navegacion y almacen
+   ========================================================== */
+
+import { el, vaciar, rolPorId, iniciales, debounce } from '../util.js';
+import { NOMBRE_SISTEMA, NOMBRE_EMPRESA, VERSION, ROL } from '../constantes.js';
+import { salir, puedeAdministrar } from '../auth/sesion.js';
+import { avisoError, confirmar } from './componentes.js';
+
+import * as repoBases from '../datos/repoBases.js';
+import * as repoCategorias from '../datos/repoCategorias.js';
+import * as repoUsuarios from '../datos/repoUsuarios.js';
+
+import { montarVistaTareas } from './vistaTareas.js';
+import { montarVistaDetalle } from './vistaDetalle.js';
+import { montarVistaBases } from './vistaBases.js';
+import { montarVistaUsuarios } from './vistaUsuarios.js';
+import { montarVistaCategorias } from './vistaCategorias.js';
+
+/* ----------------------------------------------------------
+   Almacen de catalogos: se mantiene actualizado en vivo y lo
+   comparten todas las vistas.
+   ---------------------------------------------------------- */
+
+const almacen = {
+  cuencas: [],
+  bases: [],
+  categorias: [],
+  usuarios: [],
+  cuencaPorId: {},
+  basePorId: {},
+  categoriaPorId: {},
+  usuarioPorId: {},
+  listo: false
+};
+
+function reindexar() {
+  almacen.cuencaPorId = {};
+  almacen.basePorId = {};
+  almacen.categoriaPorId = {};
+  almacen.usuarioPorId = {};
+  for (const c of almacen.cuencas) almacen.cuencaPorId[c.id] = c;
+  for (const b of almacen.bases) almacen.basePorId[b.id] = b;
+  for (const c of almacen.categorias) almacen.categoriaPorId[c.id] = c;
+  for (const u of almacen.usuarios) almacen.usuarioPorId[u.id] = u;
+}
+
+/** Nombre legible de la base, con su cuenca. */
+almacen.textoBase = function (baseId) {
+  const base = almacen.basePorId[baseId];
+  if (!base) return 'Base eliminada';
+  return base.nombre;
+};
+
+almacen.textoCuencaDeBase = function (baseId) {
+  const base = almacen.basePorId[baseId];
+  if (!base) return '';
+  const cuenca = almacen.cuencaPorId[base.cuencaId];
+  return cuenca ? cuenca.codigo : '';
+};
+
+almacen.nombreUsuario = function (uid) {
+  const u = almacen.usuarioPorId[uid];
+  return u ? u.nombre : 'Usuario eliminado';
+};
+
+/** Opciones de base agrupadas por cuenca, para los selectores. */
+almacen.opcionesBases = function (soloActivas = true) {
+  return almacen.bases
+    .filter(b => (soloActivas ? b.activa !== false : true))
+    .map(b => ({
+      valor: b.id,
+      texto: `${b.codigo} - ${b.nombre}`,
+      grupo: (almacen.cuencaPorId[b.cuencaId] || {}).nombre || 'Sin cuenca'
+    }));
+};
+
+almacen.operadores = function () {
+  return almacen.usuarios.filter(u => u.activo !== false && u.rol === ROL.OPERADOR);
+};
+
+/** Personas asignables: operadores y, para tareas propias, tambien editores. */
+almacen.asignables = function () {
+  return almacen.usuarios.filter(u => u.activo !== false && u.rol !== ROL.ADMIN);
+};
+
+/* ----------------------------------------------------------
+   Estado de navegacion
+   ---------------------------------------------------------- */
+
+let vistaActual = null;      // { nombre, params, instancia }
+let contenidoNodo = null;
+let navNodo = null;
+let desuscripciones = [];
+
+const VISTAS = {
+  tareas: { titulo: 'Tareas', montar: montarVistaTareas, admin: false },
+  detalle: { titulo: 'Detalle de tarea', montar: montarVistaDetalle, admin: false, oculta: true },
+  bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
+  usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
+  categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true }
+};
+
+/* ----------------------------------------------------------
+   Montaje
+   ---------------------------------------------------------- */
+
+export function montarLayout(contenedor, usuario) {
+  vaciar(contenedor);
+  cortarSuscripciones();
+  fijarUsuarioSesion(usuario);
+
+  const rol = rolPorId(usuario.rol);
+
+  navNodo = el('nav.nav');
+
+  const cabecera = el('header.cabecera', {}, [
+    el('div.cabecera-marca', {}, [
+      el('img', { src: 'assets/logo.png', alt: NOMBRE_EMPRESA, width: 30, height: 30 }),
+      el('div', {}, [
+        el('div.nombre', { texto: NOMBRE_SISTEMA }),
+        el('div.sub', { texto: NOMBRE_EMPRESA })
+      ])
+    ]),
+    el('div.cabecera-espacio'),
+    el('div.cabecera-usuario', {}, [
+      el('div.datos', {}, [
+        el('div.n', { texto: usuario.nombre || usuario.email }),
+        el('div.r', { texto: rol.nombre })
+      ]),
+      el('span.inicial', { texto: iniciales(usuario.nombre || usuario.email) }),
+      el('button.btn.btn-plano.btn-chico', {
+        texto: 'Salir',
+        on: {
+          click: async () => {
+            const ok = await confirmar({
+              titulo: 'Cerrar sesion',
+              mensaje: 'Vas a salir del sistema.',
+              textoOk: 'Cerrar sesion'
+            });
+            if (ok) {
+              cortarSuscripciones();
+              await salir();
+            }
+          }
+        }
+      })
+    ])
+  ]);
+
+  contenidoNodo = el('main.contenido');
+
+  contenedor.appendChild(
+    el('div.marco', {}, [cabecera, navNodo, contenidoNodo])
+  );
+
+  dibujarNav(usuario);
+  iniciarAlmacen(usuario);
+  ir('tareas');
+}
+
+function dibujarNav(usuario) {
+  vaciar(navNodo);
+
+  const agregar = (nombre) => {
+    const def = VISTAS[nombre];
+    navNodo.appendChild(el('button', {
+      texto: def.titulo,
+      dataset: { vista: nombre },
+      on: { click: () => ir(nombre) }
+    }));
+  };
+
+  agregar('tareas');
+
+  if (puedeAdministrar(usuario)) {
+    navNodo.appendChild(el('div.separador', { texto: 'Administracion' }));
+    agregar('bases');
+    agregar('usuarios');
+    agregar('categorias');
+  }
+
+  navNodo.appendChild(el('div.pie', { texto: `v${VERSION}` }));
+}
+
+function marcarNav(nombre) {
+  if (!navNodo) return;
+  for (const boton of navNodo.querySelectorAll('button[data-vista]')) {
+    boton.classList.toggle('activo', boton.dataset.vista === nombre);
+  }
+}
+
+/* ----------------------------------------------------------
+   Suscripciones a los catalogos
+   ---------------------------------------------------------- */
+
+function iniciarAlmacen(usuario) {
+  const refrescar = debounce(() => {
+    reindexar();
+    almacen.listo = true;
+    if (vistaActual && vistaActual.instancia && vistaActual.instancia.actualizar) {
+      try { vistaActual.instancia.actualizar(); } catch (e) { console.error(e); }
+    }
+  }, 60);
+
+  desuscripciones.push(repoBases.escucharCuencas(lista => { almacen.cuencas = lista; refrescar(); }));
+  desuscripciones.push(repoBases.escucharBases(lista => { almacen.bases = lista; refrescar(); }));
+  desuscripciones.push(repoCategorias.escuchar(lista => { almacen.categorias = lista; refrescar(); }));
+  desuscripciones.push(repoUsuarios.escuchar(lista => { almacen.usuarios = lista; refrescar(); }));
+
+  void usuario;
+}
+
+function cortarSuscripciones() {
+  for (const cortar of desuscripciones) {
+    try { cortar(); } catch (e) { /* ya cortada */ }
+  }
+  desuscripciones = [];
+  desmontarVista();
+}
+
+function desmontarVista() {
+  if (vistaActual && vistaActual.instancia && vistaActual.instancia.desmontar) {
+    try { vistaActual.instancia.desmontar(); } catch (e) { console.error(e); }
+  }
+  vistaActual = null;
+}
+
+/* ----------------------------------------------------------
+   Ruteo
+   ---------------------------------------------------------- */
+
+export function ir(nombre, params = {}) {
+  const def = VISTAS[nombre];
+  if (!def) {
+    avisoError(`La vista "${nombre}" no existe.`);
+    return;
+  }
+
+  const usuario = ctxBase().usuario;
+  if (def.admin && !puedeAdministrar(usuario)) {
+    avisoError('No tenes permisos para esa seccion.');
+    return;
+  }
+
+  desmontarVista();
+  vaciar(contenidoNodo);
+  marcarNav(def.oculta ? 'tareas' : nombre);
+
+  const instancia = def.montar(contenidoNodo, { ...ctxBase(), params });
+  vistaActual = { nombre, params, instancia: instancia || {} };
+  window.scrollTo({ top: 0 });
+}
+
+let usuarioSesion = null;
+
+export function fijarUsuarioSesion(usuario) {
+  usuarioSesion = usuario;
+}
+
+function ctxBase() {
+  return {
+    usuario: usuarioSesion,
+    almacen,
+    ir,
+    volverATareas: () => ir('tareas')
+  };
+}
+
+export { almacen };

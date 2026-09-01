@@ -1,0 +1,184 @@
+/* ==========================================================
+   vistas.css - Estilos propios de cada pantalla
+   ========================================================== */
+
+/* ---------- Ingreso / alta del primer administrador ---------- */
+.pantalla-ingreso {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 30px 16px;
+  background:
+    radial-gradient(1000px 480px at 50% -12%, rgba(77, 169, 206, 0.14), transparent 70%),
+    var(--fondo);
+}
+.caja-ingreso {
+  width: 100%;
+  max-width: 372px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  box-shadow: var(--sombra);
+  padding: 28px 26px 24px;
+}
+.caja-ingreso .marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+.caja-ingreso .marca img { width: 58px; height: 58px; }
+.caja-ingreso .marca .titulo { font-size: 17px; font-weight: 600; }
+.caja-ingreso .marca .sub { font-size: 12px; color: var(--texto-tenue); }
+.caja-ingreso .btn-primario { width: 100%; margin-top: 6px; padding: 10px; }
+.caja-ingreso .pie {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--texto-tenue);
+}
+.caja-ingreso .nota {
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  background: var(--acento-tenue);
+  border: 1px solid var(--acento-oscuro);
+  border-radius: var(--radio);
+  font-size: 12.5px;
+  color: var(--texto-medio);
+}
+
+/* ---------- Resumen de tareas ---------- */
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.resumen-item {
+  padding: 12px 14px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-top: 2px solid var(--borde);
+  border-radius: var(--radio-g);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--texto);
+}
+.resumen-item:hover { background: var(--superficie-alta); }
+.resumen-item.activo { border-color: var(--acento); }
+.resumen-item .n { font-size: 23px; font-weight: 600; line-height: 1.1; }
+.resumen-item .e { font-size: 12px; color: var(--texto-medio); }
+
+/* ---------- Fila de tarea ---------- */
+.tit-tarea { display: flex; align-items: center; gap: 8px; }
+.marca-prioridad {
+  width: 3px;
+  height: 17px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+.asignados { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* ---------- Detalle de tarea ---------- */
+.detalle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 296px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .detalle { grid-template-columns: minmax(0, 1fr); }
+}
+.detalle-titulo { font-size: 19px; font-weight: 600; margin: 0 0 6px; }
+.detalle-desc {
+  white-space: pre-wrap;
+  color: var(--texto-medio);
+  line-height: 1.6;
+  max-width: 72ch;
+}
+.ficha { display: grid; grid-template-columns: 88px 1fr; gap: 8px 10px; font-size: 13px; }
+.ficha dt { color: var(--texto-tenue); font-size: 12px; }
+.ficha dd { margin: 0; }
+
+/* ---------- Linea de tiempo de avances ---------- */
+.avances { position: relative; margin-top: 4px; padding-left: 20px; }
+.avances::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--borde);
+}
+.avance { position: relative; padding: 0 0 18px; }
+.avance:last-child { padding-bottom: 0; }
+.avance::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: 2px solid var(--acento);
+}
+.avance .meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.avance .autor { font-weight: 600; font-size: 13px; }
+.avance .fecha { font-size: 11.5px; color: var(--texto-tenue); font-family: var(--fuente-mono); }
+.avance .texto { white-space: pre-wrap; color: var(--texto-medio); max-width: 72ch; line-height: 1.55; }
+.avance .cambio-estado { font-size: 11.5px; color: var(--texto-tenue); }
+
+.form-avance textarea { min-height: 68px; }
+.form-avance .fila {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.form-avance .fila .campo { flex: 1; min-width: 160px; margin: 0; }
+
+/* ---------- ABM ---------- */
+.grupo-cuenca {
+  margin-bottom: 6px;
+  padding: 5px 12px;
+  background: #251E17;
+  border-top: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
+  color: var(--acento);
+  font-weight: 600;
+}
+.codigo-base {
+  display: inline-block;
+  min-width: 34px;
+  padding: 1px 6px;
+  background: #1A140F;
+  border: 1px solid var(--borde);
+  border-radius: 3px;
+  font-family: var(--fuente-mono);
+  font-size: 11.5px;
+  color: var(--acento);
+  text-align: center;
+}
+.inactivo { opacity: 0.5; }
+.muestra-color {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 6px;
+}
