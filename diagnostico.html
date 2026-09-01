@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnostico | Tareas Petromark</title>
+<style>
+  :root {
+    --fondo: #201913; --superficie: #2A211A; --borde: #3E3227;
+    --acento: #4DA9CE; --texto: #FFFFFF; --texto-tenue: #8C8073;
+    --ok: #5FB37A; --error: #D9603F; --alerta: #D9A32B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px; background: var(--fondo); color: var(--texto);
+    font-family: "Segoe UI", Tahoma, sans-serif; font-size: 14px; line-height: 1.5;
+  }
+  .caja { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 19px; margin: 0 0 4px; }
+  .sub { color: var(--texto-tenue); font-size: 12.5px; margin: 0 0 20px; }
+  .prueba {
+    background: var(--superficie); border: 1px solid var(--borde);
+    border-left: 3px solid var(--texto-tenue); border-radius: 4px;
+    padding: 11px 14px; margin-bottom: 8px;
+  }
+  .prueba.ok { border-left-color: var(--ok); }
+  .prueba.mal { border-left-color: var(--error); }
+  .prueba.aviso { border-left-color: var(--alerta); }
+  .prueba .t { font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .prueba .estado { font-size: 11.5px; padding: 1px 8px; border: 1px solid currentColor; border-radius: 10px; }
+  .ok .estado { color: var(--ok); }
+  .mal .estado { color: var(--error); }
+  .aviso .estado { color: var(--alerta); }
+  .prueba .d {
+    color: var(--texto-tenue); font-size: 12.5px; margin-top: 5px;
+    font-family: Consolas, monospace; word-break: break-all; white-space: pre-wrap;
+  }
+  h2 { font-size: 14px; margin: 22px 0 8px; color: var(--acento); }
+  #conclusion {
+    margin-top: 22px; padding: 14px 16px; background: var(--superficie);
+    border: 1px solid var(--acento); border-radius: 4px; white-space: pre-wrap;
+  }
+  a { color: var(--acento); }
+</style>
+</head>
+<body>
+<div class="caja">
+  <h1>Diagnostico del sistema</h1>
+  <p class="sub">Seguimiento de Tareas - Petromark SRL. Esta pagina no forma parte del sistema: solo verifica el entorno.</p>
+
+  <h2>Entorno</h2>
+  <div id="entorno"></div>
+
+  <h2>Archivos del sitio</h2>
+  <div id="archivos"></div>
+
+  <h2>SDK de Firebase</h2>
+  <div id="sdk"></div>
+
+  <h2>Base de datos</h2>
+  <div id="base"></div>
+
+  <div id="conclusion">Ejecutando pruebas...</div>
+</div>
+
+<script>
+/* Sin modulos ES a proposito: esta pagina tiene que funcionar siempre. */
+
+var URL_BASE = 'https://tareas-petromark-default-rtdb.firebaseio.com';
+var PROYECTO = 'tareas-petromark';
+var API_KEY = 'AIzaSyDLVOUsrYpNBvdJfuiZKGhl8LIA1VxHAyw';
+
+var problemas = [];
+
+function fila(zona, titulo, estado, detalle) {
+  var clases = { ok: 'ok', mal: 'mal', aviso: 'aviso' };
+  var etiquetas = { ok: 'OK', mal: 'FALLA', aviso: 'ATENCION' };
+  var div = document.createElement('div');
+  div.className = 'prueba ' + (clases[estado] || '');
+  var t = document.createElement('div');
+  t.className = 't';
+  var e = document.createElement('span');
+  e.className = 'estado';
+  e.textContent = etiquetas[estado] || '?';
+  t.appendChild(e);
+  t.appendChild(document.createTextNode(titulo));
+  div.appendChild(t);
+  if (detalle) {
+    var d = document.createElement('div');
+    d.className = 'd';
+    d.textContent = detalle;
+    div.appendChild(d);
+  }
+  document.getElementById(zona).appendChild(div);
+  if (estado === 'mal') problemas.push(titulo);
+}
+
+/* ---------- 1. Entorno ---------- */
+function probarEntorno() {
+  var protocolo = window.location.protocol;
+  if (protocolo === 'file:') {
+    fila('entorno', 'Protocolo', 'mal',
+      'Estas abriendo el archivo con doble clic (file://). Los modulos ES no funcionan asi.\n' +
+      'Servilo por HTTP: python -m http.server 8000');
+  } else {
+    fila('entorno', 'Protocolo', 'ok', protocolo + '//' + window.location.host);
+  }
+
+  fila('entorno', 'Direccion de esta pagina', 'ok', window.location.href);
+
+  var carpeta = window.location.pathname.replace(/[^/]*$/, '');
+  fila('entorno', 'Carpeta base del sitio', 'ok', carpeta);
+
+  fila('entorno', 'Soporte de modulos ES', 'ok',
+    ('noModule' in document.createElement('script')) ? 'El navegador los soporta.' : 'Navegador muy viejo.');
+}
+
+/* ---------- 2. Archivos ---------- */
+var ARCHIVOS = [
+  'index.html',
+  'estilos/base.css', 'estilos/componentes.css', 'estilos/vistas.css',
+  'assets/logo.png',
+  'js/main.js', 'js/constantes.js', 'js/util.js', 'js/firebase.js',
+  'js/auth/sesion.js',
+  'js/datos/repoBases.js', 'js/datos/repoCategorias.js', 'js/datos/repoUsuarios.js',
+  'js/datos/repoTareas.js', 'js/datos/repoAvances.js',
+  'js/interfaz/componentes.js', 'js/interfaz/login.js', 'js/interfaz/layout.js',
+  'js/interfaz/formTarea.js', 'js/interfaz/vistaTareas.js', 'js/interfaz/vistaDetalle.js',
+  'js/interfaz/vistaBases.js', 'js/interfaz/vistaUsuarios.js', 'js/interfaz/vistaCategorias.js'
+];
+
+async function probarArchivos() {
+  var faltantes = [];
+  var presentes = 0;
+
+  for (var i = 0; i < ARCHIVOS.length; i++) {
+    var ruta = ARCHIVOS[i];
+    try {
+      var r = await fetch(ruta, { cache: 'no-store' });
+      if (r.ok) presentes++;
+      else faltantes.push(ruta + '  (HTTP ' + r.status + ')');
+    } catch (err) {
+      faltantes.push(ruta + '  (' + err.message + ')');
+    }
+  }
+
+  if (!faltantes.length) {
+    fila('archivos', 'Los ' + ARCHIVOS.length + ' archivos estan publicados', 'ok',
+      'Ninguno falta y ninguno da error.');
+  } else {
+    fila('archivos', 'Faltan ' + faltantes.length + ' de ' + ARCHIVOS.length + ' archivos', 'mal',
+      faltantes.join('\n') +
+      '\n\nOjo con mayusculas y minusculas: GitHub Pages las distingue, Windows no.');
+  }
+
+  /* Verifica que main.js sea la version con tiempo limite */
+  try {
+    var rm = await fetch('js/main.js', { cache: 'no-store' });
+    if (rm.ok) {
+      var txt = await rm.text();
+      if (txt.indexOf('conTiempoLimite') >= 0) {
+        fila('archivos', 'main.js actualizado', 'ok', 'Incluye el corte por tiempo limite.');
+      } else {
+        fila('archivos', 'main.js es la version vieja', 'aviso',
+          'No tiene el corte por tiempo limite, por eso se queda colgado en la pantalla de carga sin mostrar el error.');
+      }
+    }
+  } catch (err) { /* ya reportado arriba */ }
+}
+
+/* ---------- 3. SDK de Firebase ---------- */
+async function probarSdk() {
+  var urls = [
+    'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js',
+    'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js',
+    'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js'
+  ];
+  for (var i = 0; i < urls.length; i++) {
+    try {
+      var r = await fetch(urls[i], { cache: 'no-store' });
+      if (r.ok) fila('sdk', urls[i].split('/').pop(), 'ok', 'Descargable desde este equipo.');
+      else fila('sdk', urls[i].split('/').pop(), 'mal', 'HTTP ' + r.status);
+    } catch (err) {
+      fila('sdk', urls[i].split('/').pop(), 'mal',
+        'No se pudo descargar: ' + err.message +
+        '\nSi estas en la red de la empresa, puede estar bloqueado gstatic.com por el proxy o el firewall.');
+    }
+  }
+}
+
+/* ---------- 4. Base de datos (por REST, sin SDK) ---------- */
+async function probarBase() {
+  fila('base', 'URL configurada', 'ok', URL_BASE);
+
+  try {
+    var r = await fetch(URL_BASE + '/config/sistema.json', { cache: 'no-store' });
+    var cuerpo = await r.text();
+
+    if (r.status === 200) {
+      if (cuerpo.trim() === 'null') {
+        fila('base', 'Lectura de /config/sistema', 'ok',
+          'Respondio null: la base existe, las reglas permiten leer y el sistema todavia no fue inicializado.\n' +
+          'Deberias ver la pantalla de creacion del primer administrador.');
+      } else {
+        fila('base', 'Lectura de /config/sistema', 'ok',
+          'El sistema ya fue inicializado: ' + cuerpo.substring(0, 200) +
+          '\nDeberias ver la pantalla de ingreso.');
+      }
+    } else if (r.status === 401 || cuerpo.indexOf('Permission denied') >= 0) {
+      fila('base', 'Lectura de /config/sistema', 'mal',
+        'Permiso denegado (HTTP ' + r.status + ').\n' +
+        'Las reglas de la base todavia estan en modo bloqueado.\n' +
+        'Pega el contenido de reglas-firebase.json en Realtime Database -> Reglas y publica.');
+    } else if (r.status === 404) {
+      fila('base', 'Lectura de /config/sistema', 'mal',
+        'HTTP 404: no existe una base en esa URL.\n' +
+        'Verifica que la Realtime Database este creada y que la URL coincida.');
+    } else {
+      fila('base', 'Lectura de /config/sistema', 'mal',
+        'HTTP ' + r.status + ': ' + cuerpo.substring(0, 300));
+    }
+  } catch (err) {
+    fila('base', 'Lectura de /config/sistema', 'mal',
+      'No hubo respuesta: ' + err.message +
+      '\nPuede ser la red de la empresa bloqueando firebaseio.com, o la URL incorrecta.');
+  }
+
+  /* Authentication: verifica que el metodo correo/contrasena este habilitado */
+  try {
+    var ra = await fetch(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + API_KEY,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'prueba-diagnostico@example.com', password: 'xxxxxxxx', returnSecureToken: true })
+      }
+    );
+    var ja = await ra.json();
+    var codigo = (ja && ja.error && ja.error.message) || '';
+
+    if (codigo.indexOf('CONFIGURATION_NOT_FOUND') >= 0 || codigo.indexOf('OPERATION_NOT_ALLOWED') >= 0) {
+      fila('base', 'Authentication (correo y contrasena)', 'mal',
+        codigo + '\nHabilitalo en Authentication -> Sign-in method -> Correo electronico/contrasena.');
+    } else if (codigo.indexOf('EMAIL_NOT_FOUND') >= 0 || codigo.indexOf('INVALID_LOGIN_CREDENTIALS') >= 0 ||
+               codigo.indexOf('INVALID_PASSWORD') >= 0) {
+      fila('base', 'Authentication (correo y contrasena)', 'ok',
+        'Habilitado y respondiendo (rechazo la cuenta de prueba, que es lo esperado).');
+    } else if (codigo) {
+      fila('base', 'Authentication', 'aviso', codigo);
+    } else {
+      fila('base', 'Authentication', 'aviso', 'Respuesta inesperada: ' + JSON.stringify(ja).substring(0, 200));
+    }
+  } catch (err) {
+    fila('base', 'Authentication', 'mal', 'Sin respuesta: ' + err.message);
+  }
+
+  /* Dominio autorizado */
+  var host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    fila('base', 'Dominio autorizado', 'ok', 'localhost siempre esta autorizado en Firebase.');
+  } else {
+    fila('base', 'Dominio a autorizar', 'aviso',
+      host + '\nTiene que figurar en Authentication -> Settings -> Dominios autorizados.\n' +
+      'Si no esta, el ingreso falla con auth/unauthorized-domain.');
+  }
+}
+
+/* ---------- Conclusion ---------- */
+async function ejecutar() {
+  probarEntorno();
+  await probarArchivos();
+  await probarSdk();
+  await probarBase();
+
+  var c = document.getElementById('conclusion');
+  if (!problemas.length) {
+    c.textContent = 'Todas las pruebas pasaron. El entorno esta bien: si el sistema igual no arranca, ' +
+      'saca captura de esta pagina completa y del panel Network del navegador.';
+  } else {
+    c.textContent = 'Se encontraron ' + problemas.length + ' problema(s):\n\n- ' +
+      problemas.join('\n- ') + '\n\nResolvelos en ese orden.';
+  }
+}
+
+ejecutar();
+</script>
+</body>
+</html>
