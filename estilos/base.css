@@ -31,9 +31,15 @@
   --acento-borde:    #A5D5E4;
 
   /* ---- Semanticos ---- */
-  --alerta:          #9A6206;
+  --ok:              #1F9254;
+  --ok-tinte:        #E7F6EE;
+  --alerta:          #B87503;
+  --alerta-tinte:    #FDF3E2;
   --error:           #B23A28;
   --error-tinte:     #FBEAE7;
+  --info-tinte:      #E9F1FB;
+
+  --alto-barra-movil: 50px;
 
   --fuente: "Segoe UI", "Segoe UI Variable", Tahoma, Verdana, sans-serif;
   --fuente-mono: Consolas, "Courier New", monospace;
@@ -222,53 +228,103 @@ code, pre, .mono { font-family: var(--fuente-mono); }
 }
 
 /* ==========================================================
-   Telefono: el riel pasa arriba
+   Telefono: barra superior fina y navegacion abajo
+   El riel deja de ser una caja: sus partes se reubican.
    ========================================================== */
 @media (max-width: 760px) {
   .marco { grid-template-columns: minmax(0, 1fr); }
 
-  .riel {
+  .riel { display: contents; }
+
+  /* Barra superior */
+  .riel-marca {
     position: sticky;
     top: 0;
     z-index: 40;
-    height: auto;
-    padding: 9px 0 0;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
-    gap: 0 10px;
-    box-shadow: 0 2px 10px rgba(20, 38, 52, 0.18);
+    gap: 9px;
+    height: 48px;
+    padding: 0 14px;
+    margin: 0;
+    background: var(--riel);
+    border-bottom: 0;
   }
-  .riel-marca { border-bottom: 0; padding: 0 12px; margin: 0; }
+  .riel-marca img { width: 24px; height: 24px; }
+  .riel-marca .nombre { font-size: 14px; }
   .riel-marca .sub { display: none; }
 
-  .riel nav {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding: 8px 12px 0;
-    gap: 4px;
+  /* Usuario: anclado a la derecha de la barra superior */
+  .riel-usuario {
+    position: fixed;
+    top: 0;
+    right: 8px;
+    z-index: 41;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border-top: 0;
   }
-  .riel nav::-webkit-scrollbar { display: none; }
+  .riel-usuario .datos { display: none; }
+  .riel-usuario .inicial { width: 26px; height: 26px; }
+  .riel-usuario .salir {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: var(--riel-texto);
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  /* Navegacion inferior, al alcance del pulgar */
+  .riel nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 2px;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px));
+    background: var(--riel);
+    box-shadow: 0 -2px 12px rgba(20, 38, 52, 0.22);
+  }
   .riel nav button {
-    width: auto;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+    padding: 6px 4px;
+    font-size: 12px;
     white-space: nowrap;
-    min-height: 36px;
-    padding: 6px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 28px;
   }
   .riel nav button.activo::before {
-    left: 0; right: 0; top: auto; bottom: -8px;
-    width: auto; height: 3px; border-radius: 3px 3px 0 0;
+    left: 10%;
+    right: 10%;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
   }
-  .riel .separador { display: none; }
-  .riel-espacio { display: none; }
-  .riel-usuario { border-top: 0; padding: 0 12px; margin: 0; gap: 6px; }
-  .riel-usuario .datos { display: none; }
-  .riel-usuario .salir { min-height: var(--tactil); display: flex; align-items: center; }
+
+  /* Con una sola seccion (operador) la barra inferior no aporta */
+  .riel nav:not(:has(button[data-vista]:nth-of-type(2))) { display: none; }
+
+  .riel .separador,
+  .riel-espacio,
   .riel .version { display: none; }
 
-  .contenido { padding: 14px 12px 40px; }
+  .contenido { padding: 14px 12px 84px; }
 
   h1 { font-size: 17px; }
   .cabecera-vista { gap: 10px; margin-bottom: 12px; }

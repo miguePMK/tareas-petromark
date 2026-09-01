@@ -30,7 +30,7 @@ js/
     repoTareas.js  repoAvances.js
   interfaz/               presentacion (sin logica de negocio)
     componentes.js  login.js  layout.js  formTarea.js
-    vistaTareas.js  vistaPorBase.js   vistaDetalle.js
+    tablero.js      vistaTareas.js    vistaDetalle.js
     vistaBases.js   vistaUsuarios.js  vistaCategorias.js
 assets/
   logo.png
@@ -102,11 +102,13 @@ de los tres roles.
 
 ## Vistas
 
-- **Tareas:** listado con resumen por estado y filtros. En pantallas de menos
-  de 760 px la tabla se convierte en tarjetas, pensada para el operador que
-  actualiza desde el telefono.
-- **Por base:** acordeones agrupados por cuenca. Cada base muestra la
-  distribucion de estados en una barra apilada y, al abrirla, sus tareas.
+- **Tareas:** vista unica con tablero de indicadores, filtros y dos modos de
+  lectura. "Por base" (predeterminado) agrupa en acordeones por cuenca y base,
+  cada una con su porcentaje de avance. "Lista" muestra la tabla completa.
+  Las tarjetas del tablero funcionan como filtros rapidos.
+  En pantallas de menos de 760 px la tabla se convierte en bloques y la
+  navegacion pasa al pie, pensada para el operador que actualiza desde el
+  telefono.
 - **Detalle:** ficha, bitacora de avances y registro de nuevos avances.
 - **Bases, Usuarios, Categorias:** ABM, solo administrador.
 

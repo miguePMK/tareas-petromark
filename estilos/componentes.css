@@ -10,9 +10,9 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 7px 13px;
   border: 1px solid var(--borde-fuerte);
-  border-radius: var(--radio);
+  border-radius: 6px;
   background: var(--panel);
   color: var(--tinta);
   font-family: inherit;
@@ -39,7 +39,7 @@
 .btn-plano { background: transparent; border-color: transparent; box-shadow: none; color: var(--tinta-media); }
 .btn-plano:hover { background: #E5EBEF; color: var(--tinta); }
 
-.btn-chico { padding: 3px 8px; font-size: 12px; }
+.btn-chico { padding: 4px 9px; font-size: 12px; border-radius: 5px; }
 .btn-icono { padding: 4px 8px; }
 
 /* ==========================================================
@@ -197,12 +197,30 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   .tabla-tarjetas thead { display: none; }
   .tabla-tarjetas, .tabla-tarjetas tbody, .tabla-tarjetas tr, .tabla-tarjetas td { display: block; width: 100%; }
 
-  .tabla-tarjetas tr {
-    padding: 11px 13px;
-    border-bottom: 1px solid var(--borde);
+  /* El marco deja de ser una caja: cada tarea es su propio bloque */
+  .tabla-marco:has(.tabla-tarjetas) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
   }
-  .tabla-tarjetas tbody tr:hover { background: transparent; }
+
+  .tabla-tarjetas tr {
+    position: relative;
+    padding: 11px 13px 11px 16px;
+    margin-bottom: 8px;
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: 9px;
+    box-shadow: var(--sombra-baja);
+    overflow: hidden;
+  }
+  .tabla-tarjetas tbody tr:hover { background: var(--panel); }
   .tabla-tarjetas tbody tr:active { background: var(--acento-tinte); }
+
+  /* En el telefono, categoria y actividad solo hacen ruido */
+  .tabla-tarjetas td[data-etiqueta="Categoria"],
+  .tabla-tarjetas td[data-etiqueta="Actividad"] { display: none; }
 
   .tabla-tarjetas td { border: 0; padding: 3px 0; }
 
@@ -237,6 +255,53 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
     margin: 0 !important;
   }
 }
+
+/* ==========================================================
+   Control segmentado
+   ========================================================== */
+.segmentado {
+  display: inline-flex;
+  padding: 2px;
+  background: #E4EAEE;
+  border-radius: 7px;
+}
+.segmentado button {
+  border: 0;
+  background: transparent;
+  color: var(--tinta-media);
+  font-family: inherit;
+  font-size: 12.5px;
+  padding: 5px 13px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.segmentado button:hover { color: var(--tinta); }
+.segmentado button.activo {
+  background: var(--panel);
+  color: var(--tinta);
+  font-weight: 600;
+  box-shadow: var(--sombra-baja);
+}
+
+/* ==========================================================
+   Barra de avance
+   ========================================================== */
+.progreso {
+  height: 8px;
+  background: #E3E9ED;
+  border-radius: 5px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 60px;
+}
+.progreso span {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--ok);
+  transition: width 0.25s ease;
+}
+.progreso.fina { height: 6px; }
 
 /* ==========================================================
    Chips

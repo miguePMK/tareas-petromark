@@ -42,6 +42,84 @@
 }
 
 /* ==========================================================
+   Tablero: indicadores, avance y proximos vencimientos
+   ========================================================== */
+.tablero { margin-bottom: 14px; }
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 10px 12px;
+  border: 1px solid;
+  border-radius: 9px;
+  background: var(--panel);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.kpi:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(20, 38, 52, 0.10); }
+.kpi .n { font-size: 23px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi .e { font-size: 11.5px; color: var(--tinta-media); }
+.kpi.activo { box-shadow: 0 0 0 2px currentColor inset; }
+.kpi.vacio-kpi { opacity: 0.62; }
+
+.panel-avance {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 15px;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-g);
+}
+.panel-avance .pct {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ok);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.panel-avance .detalle-avance { flex: 1; min-width: 0; }
+.panel-avance .leyenda { font-size: 11.5px; color: var(--tinta-tenue); margin-top: 5px; }
+
+.vencimientos { margin-top: 10px; }
+.vencimientos .fila-venc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #EDF1F4;
+  font-family: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.vencimientos .fila-venc:last-child { border-bottom: 0; }
+.vencimientos .fila-venc:hover { background: var(--acento-tinte); }
+.vencimientos .fila-venc .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vencimientos .fila-venc .b { color: var(--tinta-tenue); font-size: 11.5px; flex: 0 0 auto; }
+.vencimientos .fila-venc .d { flex: 0 0 auto; font-weight: 600; font-size: 11.5px; }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .kpi { padding: 9px 11px; }
+  .kpi .n { font-size: 20px; }
+  .panel-avance { gap: 11px; padding: 11px 12px; }
+}
+
+/* ==========================================================
    Resumen por estado
    ========================================================== */
 .resumen { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
@@ -77,6 +155,14 @@
 .asignados { display: flex; flex-wrap: wrap; gap: 3px; }
 @media (max-width: 760px) {
   .marca-prioridad { height: 30px; width: 4px; }
+  /* En la tarjeta, la prioridad pinta el borde izquierdo completo */
+  .tabla-tarjetas .marca-prioridad {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    height: auto;
+    width: 4px;
+    border-radius: 0;
+  }
 }
 
 /* ==========================================================
@@ -121,6 +207,7 @@
 }
 .acordeon > summary::-webkit-details-marker { display: none; }
 .acordeon > summary:hover { background: var(--panel-tenue); }
+.acordeon[open] > summary { background: var(--acento-tinte); }
 
 .acordeon .flecha {
   flex: 0 0 auto;
@@ -135,17 +222,24 @@
 .acordeon .datos-base { min-width: 0; flex: 1; }
 .acordeon .sin-abiertas { font-size: 11.5px; color: var(--tinta-tenue); font-weight: 400; }
 
-/* Barra apilada con la distribucion de estados */
-.barra-estados {
+/* Avance de la base: porcentaje y barra, a la derecha del acordeon */
+.avance-base {
   display: flex;
-  width: 132px;
-  height: 7px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--borde);
+  align-items: center;
+  gap: 9px;
   flex: 0 0 auto;
+  width: 168px;
 }
-.barra-estados span { display: block; height: 100%; }
+.avance-base .pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ok);
+  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+  text-align: right;
+}
+.avance-base .pct.cero { color: var(--tinta-tenue); }
+.avance-base .fraccion { font-size: 11px; color: var(--tinta-tenue); font-variant-numeric: tabular-nums; }
 
 .acordeon .conteos { display: flex; gap: 4px; flex: 0 0 auto; }
 .contador {
@@ -183,7 +277,7 @@
 
 @media (max-width: 760px) {
   .acordeon > summary { flex-wrap: wrap; gap: 8px; padding: 11px 12px; min-height: var(--tactil); }
-  .barra-estados { width: 100%; order: 3; }
+  .avance-base { width: 100%; order: 3; }
   .acordeon .conteos { order: 2; margin-left: auto; }
   .tarea-mini { flex-wrap: wrap; padding: 10px 12px; min-height: var(--tactil); }
   .tarea-mini .venc { width: 100%; }
