@@ -300,6 +300,9 @@ export function montarVistaTareas(contenedor, ctx) {
               marcaPrioridad(tarea.prioridad),
               el('div', {}, [
                 el('div.principal', { texto: tarea.titulo }),
+                tarea.solicitante
+                  ? el('div.secundario', { texto: `Solicita: ${tarea.solicitante}` })
+                  : null,
                 tarea.descripcion ? el('div.secundario', { texto: recortar(tarea.descripcion, 78) }) : null
               ])
             ])

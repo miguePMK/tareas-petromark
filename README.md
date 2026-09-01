@@ -19,7 +19,8 @@ estilos/
   componentes.css         botones, campos, tablas, modales, avisos
   vistas.css              estilos propios de cada pantalla
 js/
-  constantes.js           TODO lo ajustable: config de Firebase, estados, semilla
+  constantes.js           TODO lo ajustable: config de Firebase, estados, semilla,
+                          sinonimos y encabezados reconocidos al importar
   util.js                 utilidades sin dependencias de UI
   firebase.js             unico punto de acceso al SDK
   main.js                 punto de entrada
@@ -27,11 +28,12 @@ js/
     sesion.js             login, observador, bootstrap del primer admin
   datos/                  repositorios (interfaz async, sin UI)
     repoBases.js  repoCategorias.js  repoUsuarios.js
-    repoTareas.js  repoAvances.js
+    repoTareas.js  repoAvances.js  importador.js
   interfaz/               presentacion (sin logica de negocio)
     componentes.js  login.js  layout.js  formTarea.js
     tablero.js      vistaTareas.js    vistaDetalle.js
     vistaBases.js   vistaUsuarios.js  vistaCategorias.js
+    vistaImportar.js
 assets/
   logo.png
 ```
@@ -111,6 +113,25 @@ de los tres roles.
   telefono.
 - **Detalle:** ficha, bitacora de avances y registro de nuevos avances.
 - **Bases, Usuarios, Categorias:** ABM, solo administrador.
+- **Importar:** carga masiva desde planilla, solo administrador. Tres pasos:
+  elegir archivo, asignar columnas y revisar. Nada se escribe hasta confirmar.
+
+### Importacion masiva
+
+- Formatos: `.xlsx`, `.xls` y `.csv`. El lector de Excel se descarga de
+  `cdn.sheetjs.com`; si la red de la empresa lo bloquea, hay que guardar la
+  planilla como CSV (el aviso aparece en pantalla).
+- Las columnas se detectan por el nombre del encabezado y se pueden corregir a
+  mano. Los alias reconocidos estan en `ENCABEZADOS_CONOCIDOS`.
+- Bases y responsables tienen que existir: si no, la fila queda con error y no
+  se importa. Las categorias y prioridades desconocidas solo generan un aviso.
+- Fechas aceptadas: `dd/mm/aaaa`, `aaaa-mm-dd` y el numero de serie interno de
+  Excel.
+- Se marcan como repetidas las tareas con el mismo titulo en la misma base, ya
+  sea contra lo que hay cargado o dentro de la misma planilla.
+- Cada tarea importada queda con un avance automatico que indica el archivo y
+  la fila de origen, y con el campo `importada: true`.
+- La escritura va en lotes de 150 con un unico update multi-ruta por lote.
 
 ---
 

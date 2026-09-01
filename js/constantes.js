@@ -86,6 +86,43 @@ export const PRIORIDADES = [
 export const PRIORIDAD_POR_DEFECTO = PRIORIDAD.MEDIA;
 
 /* ----------------------------------------------------------
+   Importacion desde planilla
+   ---------------------------------------------------------- */
+
+/* Nombres de columna que se reconocen solos al importar.
+   Se comparan normalizados: sin acentos, sin mayusculas. */
+export const ENCABEZADOS_CONOCIDOS = {
+  baseId: ['base', 'base op', 'base operativa', 'sector', 'ubicacion'],
+  titulo: ['tarea', 'descripcion de tarea', 'descripcion', 'titulo', 'detalle', 'trabajo'],
+  solicitante: ['solicitante', 'pedido por', 'requirente', 'solicita'],
+  asignados: ['responsable', 'respopnsable', 'asignado', 'asignado a', 'encargado', 'ejecuta'],
+  prioridad: ['prioridad', 'urgencia'],
+  estado: ['estado', 'situacion', 'avance'],
+  categoriaId: ['categoria', 'rubro', 'tipo'],
+  vencimiento: ['vencimiento', 'fecha fin', 'f. fin', 'fecha limite', 'plazo', 'entrega'],
+  descripcion: ['observaciones', 'observacion', 'notas', 'comentarios', 'detalle adicional']
+};
+
+/* Sinonimos aceptados en las columnas de estado y prioridad. */
+export const SINONIMOS_ESTADO = {
+  pendiente: ['pendiente', 'sin iniciar', 'no iniciado', 'a realizar', 'nuevo'],
+  en_curso: ['en curso', 'en proceso', 'en progreso', 'iniciado', 'en ejecucion', 'trabajando'],
+  en_espera: ['en espera', 'espera', 'bloqueado', 'demorado', 'suspendido', 'standby'],
+  finalizada: ['finalizada', 'finalizado', 'completado', 'completada', 'terminado', 'terminada', 'hecho', 'listo', 'ok'],
+  cancelada: ['cancelada', 'cancelado', 'anulado', 'anulada', 'descartado', 'no aplica']
+};
+
+export const SINONIMOS_PRIORIDAD = {
+  baja: ['baja', 'low', 'menor'],
+  media: ['media', 'normal', 'medio', 'standard'],
+  alta: ['alta', 'high', 'importante'],
+  critica: ['critica', 'critico', 'urgente', 'maxima']
+};
+
+/* Tope de tareas por escritura, para no armar un update gigante. */
+export const TAM_LOTE_IMPORTACION = 150;
+
+/* ----------------------------------------------------------
    Semilla inicial (se carga una sola vez, al crear el primer admin)
    ---------------------------------------------------------- */
 export const SEMILLA_CUENCAS = [

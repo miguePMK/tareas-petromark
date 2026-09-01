@@ -16,6 +16,7 @@ import { montarVistaDetalle } from './vistaDetalle.js';
 import { montarVistaBases } from './vistaBases.js';
 import { montarVistaUsuarios } from './vistaUsuarios.js';
 import { montarVistaCategorias } from './vistaCategorias.js';
+import { montarVistaImportar } from './vistaImportar.js';
 
 /* ----------------------------------------------------------
    Almacen de catalogos: se mantiene actualizado en vivo y lo
@@ -98,7 +99,8 @@ const VISTAS = {
   detalle: { titulo: 'Detalle de tarea', montar: montarVistaDetalle, admin: false, oculta: true },
   bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
   usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
-  categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true }
+  categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true },
+  importar: { titulo: 'Importar', montar: montarVistaImportar, admin: true }
 };
 
 /* ----------------------------------------------------------
@@ -179,6 +181,7 @@ function dibujarNav(usuario) {
     agregar('bases');
     agregar('usuarios');
     agregar('categorias');
+    agregar('importar');
   }
 }
 

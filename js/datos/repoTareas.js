@@ -7,7 +7,7 @@ import {
 } from '../firebase.js';
 
 import { aLista, ordenarPor, clavesActivas, aMapa } from '../util.js';
-import { ESTADO, PRIORIDAD_POR_DEFECTO, ESTADOS_CIERRE } from '../constantes.js';
+import { ESTADO, PRIORIDAD_POR_DEFECTO, ESTADOS_CIERRE, TAM_LOTE_IMPORTACION } from '../constantes.js';
 
 /* ----------------------------------------------------------
    Lectura
@@ -52,6 +52,7 @@ export async function crear(datos, uidAutor) {
   await set(nueva, {
     titulo: datos.titulo.trim(),
     descripcion: (datos.descripcion || '').trim() || null,
+    solicitante: (datos.solicitante || '').trim() || null,
     baseId: datos.baseId,
     categoriaId: datos.categoriaId || null,
     prioridad: datos.prioridad || PRIORIDAD_POR_DEFECTO,
@@ -75,6 +76,7 @@ export async function actualizarDefinicion(id, datos, asignadosAnteriores) {
   await update(ref(db, `tareas/${id}`), {
     titulo: datos.titulo.trim(),
     descripcion: (datos.descripcion || '').trim() || null,
+    solicitante: (datos.solicitante || '').trim() || null,
     baseId: datos.baseId,
     categoriaId: datos.categoriaId || null,
     prioridad: datos.prioridad || PRIORIDAD_POR_DEFECTO,
@@ -109,6 +111,75 @@ export async function eliminar(id, asignados) {
   await remove(ref(db, `avances/${id}`));
   await remove(ref(db, `tareas/${id}`));
   await sincronizarIndice(id, asignados || [], []);
+}
+
+/* ----------------------------------------------------------
+   Alta por lote (importacion)
+   ---------------------------------------------------------- */
+
+/**
+ * Crea muchas tareas con la menor cantidad de escrituras posible.
+ * Cada lote es un unico update multi-ruta: si algo falla, ese lote
+ * completo no se aplica, en lugar de dejar la carga por la mitad.
+ *
+ * @param {Array} lista  tareas ya validadas
+ * @param {object} autor perfil del usuario que importa
+ * @param {function} alAvanzar  callback(hechas, total) para la barra de progreso
+ * @returns {Promise<string[]>} ids creados
+ */
+export async function crearLote(lista, autor, alAvanzar) {
+  const creados = [];
+
+  for (let desde = 0; desde < lista.length; desde += TAM_LOTE_IMPORTACION) {
+    const trozo = lista.slice(desde, desde + TAM_LOTE_IMPORTACION);
+    const cambios = {};
+
+    for (const datos of trozo) {
+      const refTarea = push(ref(db, 'tareas'));
+      const id = refTarea.key;
+      const asignados = aMapa(datos.asignados);
+      const estado = datos.estado || ESTADO.PENDIENTE;
+      const cerrada = ESTADOS_CIERRE.includes(estado);
+
+      cambios[`tareas/${id}`] = {
+        titulo: datos.titulo.trim(),
+        descripcion: (datos.descripcion || '').trim() || null,
+        solicitante: (datos.solicitante || '').trim() || null,
+        baseId: datos.baseId,
+        categoriaId: datos.categoriaId || null,
+        prioridad: datos.prioridad || PRIORIDAD_POR_DEFECTO,
+        vencimiento: datos.vencimiento || null,
+        estado: estado,
+        asignados: asignados,
+        creadaPor: autor.uid,
+        creadaEn: serverTimestamp(),
+        ultimaActividad: serverTimestamp(),
+        cerradaEn: cerrada ? serverTimestamp() : null,
+        importada: true
+      };
+
+      const refAvance = push(ref(db, `avances/${id}`));
+      cambios[`avances/${id}/${refAvance.key}`] = {
+        autorUid: autor.uid,
+        autorNombre: autor.nombre || autor.email,
+        texto: datos.notaImportacion || 'Tarea cargada por importacion de planilla.',
+        estadoAnterior: null,
+        estadoNuevo: estado,
+        creadaEn: serverTimestamp()
+      };
+
+      for (const uid of clavesActivas(asignados)) {
+        cambios[`indices/tareasPorUsuario/${uid}/${id}`] = true;
+      }
+
+      creados.push(id);
+    }
+
+    await update(ref(db), cambios);
+    if (alAvanzar) alAvanzar(Math.min(desde + trozo.length, lista.length), lista.length);
+  }
+
+  return creados;
 }
 
 /* ----------------------------------------------------------

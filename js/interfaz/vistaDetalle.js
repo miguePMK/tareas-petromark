@@ -257,6 +257,9 @@ export function montarVistaDetalle(contenedor, ctx) {
           el('dt', { texto: 'Cuenca' }),
           el('dd', { texto: base ? (almacen.cuencaPorId[base.cuencaId] || {}).nombre || '-' : '-' }),
 
+          tarea.solicitante ? el('dt', { texto: 'Solicitante' }) : null,
+          tarea.solicitante ? el('dd', { texto: tarea.solicitante }) : null,
+
           el('dt', { texto: 'Vencimiento' }),
           el('dd', {}, [
             el('span', {

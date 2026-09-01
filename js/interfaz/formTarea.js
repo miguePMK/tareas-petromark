@@ -39,6 +39,14 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     placeholder: 'Detalle, contexto, datos utiles para el operador'
   });
 
+  const solicitante = campoTexto({
+    etiqueta: 'Solicitante',
+    nombre: 'solicitante',
+    valor: tarea ? tarea.solicitante || '' : '',
+    placeholder: 'Quien pidio el trabajo',
+    maxlength: 80
+  });
+
   const base = campoSelector({
     etiqueta: 'Base',
     nombre: 'baseId',
@@ -101,6 +109,7 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
       descripcion.nodo,
       el('div.subtitulo', { texto: 'Ubicacion y clasificacion' }),
       base.nodo,
+      solicitante.nodo,
       categoria.nodo,
       prioridad.nodo,
       vencimiento.nodo,
@@ -129,6 +138,7 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     const datos = {
       titulo: titulo.valor(),
       descripcion: descripcion.valor(),
+      solicitante: solicitante.valor(),
       baseId: base.valor(),
       categoriaId: categoria.valor() || null,
       prioridad: prioridad.valor(),
