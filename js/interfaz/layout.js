@@ -112,25 +112,27 @@ export function montarLayout(contenedor, usuario) {
 
   const rol = rolPorId(usuario.rol);
 
-  navNodo = el('nav.nav');
+  navNodo = el('nav');
 
-  const cabecera = el('header.cabecera', {}, [
-    el('div.cabecera-marca', {}, [
+  const riel = el('aside.riel', {}, [
+    el('div.riel-marca', {}, [
       el('img', { src: 'assets/logo.png', alt: NOMBRE_EMPRESA, width: 30, height: 30 }),
       el('div', {}, [
-        el('div.nombre', { texto: NOMBRE_SISTEMA }),
+        el('div.nombre', { texto: 'Tareas' }),
         el('div.sub', { texto: NOMBRE_EMPRESA })
       ])
     ]),
-    el('div.cabecera-espacio'),
-    el('div.cabecera-usuario', {}, [
+    navNodo,
+    el('div.riel-espacio'),
+    el('div.riel-usuario', {}, [
+      el('span.inicial', { texto: iniciales(usuario.nombre || usuario.email) }),
       el('div.datos', {}, [
-        el('div.n', { texto: usuario.nombre || usuario.email }),
+        el('div.n', { texto: usuario.nombre || usuario.email, title: usuario.email || '' }),
         el('div.r', { texto: rol.nombre })
       ]),
-      el('span.inicial', { texto: iniciales(usuario.nombre || usuario.email) }),
-      el('button.btn.btn-plano.btn-chico', {
+      el('button.salir', {
         texto: 'Salir',
+        title: 'Cerrar sesion',
         on: {
           click: async () => {
             const ok = await confirmar({
@@ -145,14 +147,13 @@ export function montarLayout(contenedor, usuario) {
           }
         }
       })
-    ])
+    ]),
+    el('div.version', { texto: `${NOMBRE_SISTEMA} v${VERSION}` })
   ]);
 
   contenidoNodo = el('main.contenido');
 
-  contenedor.appendChild(
-    el('div.marco', {}, [cabecera, navNodo, contenidoNodo])
-  );
+  contenedor.appendChild(el('div.marco', {}, [riel, contenidoNodo]));
 
   dibujarNav(usuario);
   iniciarAlmacen(usuario);
@@ -179,8 +180,6 @@ function dibujarNav(usuario) {
     agregar('usuarios');
     agregar('categorias');
   }
-
-  navNodo.appendChild(el('div.pie', { texto: `v${VERSION}` }));
 }
 
 function marcarNav(nombre) {

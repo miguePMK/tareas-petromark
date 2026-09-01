@@ -54,12 +54,13 @@ export const ESTADO = {
   CANCELADA: 'cancelada'
 };
 
+/* Los colores estan calibrados para leerse sobre fondo claro. */
 export const ESTADOS = [
-  { id: ESTADO.PENDIENTE, nombre: 'Pendiente', color: '#D9A32B', abierto: true },
-  { id: ESTADO.EN_CURSO, nombre: 'En curso', color: '#4DA9CE', abierto: true },
-  { id: ESTADO.EN_ESPERA, nombre: 'En espera', color: '#9B7BC4', abierto: true },
-  { id: ESTADO.FINALIZADA, nombre: 'Finalizada', color: '#5FB37A', abierto: false },
-  { id: ESTADO.CANCELADA, nombre: 'Cancelada', color: '#7C8894', abierto: false }
+  { id: ESTADO.PENDIENTE, nombre: 'Pendiente', color: '#9A6206', abierto: true },
+  { id: ESTADO.EN_CURSO, nombre: 'En curso', color: '#10627C', abierto: true },
+  { id: ESTADO.EN_ESPERA, nombre: 'En espera', color: '#5D4E96', abierto: true },
+  { id: ESTADO.FINALIZADA, nombre: 'Finalizada', color: '#1F7A52', abierto: false },
+  { id: ESTADO.CANCELADA, nombre: 'Cancelada', color: '#6B7885', abierto: false }
 ];
 
 /* Estados que exigen un comentario obligatorio al aplicarse */
@@ -76,10 +77,10 @@ export const PRIORIDAD = {
 };
 
 export const PRIORIDADES = [
-  { id: PRIORIDAD.BAJA, nombre: 'Baja', color: '#7C8894', peso: 1 },
-  { id: PRIORIDAD.MEDIA, nombre: 'Media', color: '#4DA9CE', peso: 2 },
-  { id: PRIORIDAD.ALTA, nombre: 'Alta', color: '#D9A32B', peso: 3 },
-  { id: PRIORIDAD.CRITICA, nombre: 'Critica', color: '#D9603F', peso: 4 }
+  { id: PRIORIDAD.BAJA, nombre: 'Baja', color: '#8A96A1', peso: 1 },
+  { id: PRIORIDAD.MEDIA, nombre: 'Media', color: '#10627C', peso: 2 },
+  { id: PRIORIDAD.ALTA, nombre: 'Alta', color: '#B87503', peso: 3 },
+  { id: PRIORIDAD.CRITICA, nombre: 'Critica', color: '#B23A28', peso: 4 }
 ];
 
 export const PRIORIDAD_POR_DEFECTO = PRIORIDAD.MEDIA;
@@ -114,17 +115,17 @@ export const SEMILLA_CUENCAS = [
 ];
 
 export const SEMILLA_CATEGORIAS = [
-  { nombre: 'Sistemas', color: '#4DA9CE' },
-  { nombre: 'Mantenimiento', color: '#D9A32B' },
-  { nombre: 'Logistica', color: '#5FB37A' },
-  { nombre: 'Administracion', color: '#9B7BC4' },
-  { nombre: 'Seguridad e Higiene', color: '#D9603F' },
-  { nombre: 'Otros', color: '#7C8894' }
+  { nombre: 'Sistemas', color: '#10627C' },
+  { nombre: 'Mantenimiento', color: '#B87503' },
+  { nombre: 'Logistica', color: '#1F7A52' },
+  { nombre: 'Administracion', color: '#5D4E96' },
+  { nombre: 'Seguridad e Higiene', color: '#B23A28' },
+  { nombre: 'Otros', color: '#6B7885' }
 ];
 
 export const COLORES_CATEGORIA = [
-  '#4DA9CE', '#5FB37A', '#D9A32B', '#D9603F',
-  '#9B7BC4', '#7C8894', '#C48A5A', '#4FB8A8'
+  '#10627C', '#1F7A52', '#B87503', '#B23A28',
+  '#5D4E96', '#6B7885', '#8A5A2B', '#0F7C74'
 ];
 
 /* ----------------------------------------------------------
