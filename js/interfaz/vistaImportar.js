@@ -27,6 +27,7 @@ export function montarVistaImportar(contenedor, ctx) {
   let mapeo = {};
   let analisis = null;
   let omitirDuplicados = true;
+  let internoPorDefecto = '';
   let importando = false;
 
   const zonaPasos = el('div.pasos');
@@ -113,7 +114,8 @@ export function montarVistaImportar(contenedor, ctx) {
         el('div.ayuda-importar', {}, [
           el('p', { texto: 'La primera fila de la planilla tiene que ser la de encabezados. Se lee la primera hoja.' }),
           el('p', { texto: 'Las columnas se detectan solas por su nombre, y en el paso siguiente podes corregir cualquiera.' }),
-          el('p', { texto: 'Las bases y los responsables tienen que existir ya en el sistema: si no, la fila se marca con error y no se importa.' })
+          el('p', { texto: 'Las bases, los internos y los externos tienen que existir ya en el sistema: si no, la fila se marca con error y no se importa.' }),
+          el('p', { texto: 'Si en la columna de responsable figuran contratistas, mapeala a "Ejecuta (externo)" y cargalos antes en la seccion Externos.' })
         ])
       ])
     );
@@ -184,6 +186,20 @@ export function montarVistaImportar(contenedor, ctx) {
       grilla.appendChild(selector.nodo);
     }
 
+    /* Toda tarea necesita un interno que pueda cargar avances.
+       Si la planilla no trae la columna, se elige uno para todas. */
+    const selInterno = campoSelector({
+      etiqueta: 'Interno de seguimiento por defecto',
+      nombre: 'internoDefecto',
+      opciones: almacen.asignables().map(u => ({ valor: u.id, texto: u.nombre })),
+      valor: internoPorDefecto,
+      vacio: 'Ninguno',
+      ayuda: 'Se aplica a las filas que no traigan un interno. Sin esto, esas filas quedan con error.'
+    });
+    selInterno.entrada.addEventListener('change', () => {
+      internoPorDefecto = selInterno.valor();
+    });
+
     const faltantes = CAMPOS_IMPORTABLES
       .filter(c => c.requerido && mapeo[c.id] === undefined)
       .map(c => c.nombre);
@@ -206,6 +222,7 @@ export function montarVistaImportar(contenedor, ctx) {
             el('span.acciones', {}, [chipTenue(`${nombreArchivo} \u00b7 ${filas.length} filas`)])
           ]),
           grilla,
+          el('div.separador-campos', {}, [selInterno.nodo]),
           faltantes.length
             ? bloqueError(`Falta indicar: ${faltantes.join(', ')}.`)
             : null
@@ -234,7 +251,9 @@ export function montarVistaImportar(contenedor, ctx) {
                   bases: almacen.bases,
                   usuarios: almacen.usuarios,
                   categorias: almacen.categorias,
-                  tareasExistentes: tareasActuales
+                  externos: almacen.externos,
+                  tareasExistentes: tareasActuales,
+                  internoPorDefecto: internoPorDefecto || null
                 });
                 paso = 3;
                 dibujar();
@@ -322,9 +341,13 @@ export function montarVistaImportar(contenedor, ctx) {
           ]),
           el('td', { texto: r.datos.baseId ? (almacen.basePorId[r.datos.baseId] || {}).codigo || '?' : '\u2014' }),
           el('td', {}, [
-            r.datos.asignados && r.datos.asignados.length
-              ? el('div.asignados', {}, r.datos.asignados.map(uid => chipTenue(almacen.nombreUsuario(uid))))
-              : el('span.secundario', { texto: 'Sin asignar' })
+            el('div.asignados', {}, [
+              ...(r.datos.asignados && r.datos.asignados.length
+                ? r.datos.asignados.map(uid => chipTenue(almacen.nombreUsuario(uid)))
+                : [el('span.secundario', { texto: 'Sin asignar' })]),
+              ...((r.datos.externos || []).map(id =>
+                el('span.chip.chip-externo', { texto: almacen.nombreExterno(id) })))
+            ])
           ]),
           el('td', { texto: r.datos.prioridad ? prioridadPorId(r.datos.prioridad).nombre : '' }),
           el('td', { texto: r.datos.estado ? estadoPorId(r.datos.estado).nombre : '' }),
@@ -364,7 +387,7 @@ export function montarVistaImportar(contenedor, ctx) {
                 el('th', { texto: 'Fila' }),
                 el('th', { texto: 'Tarea' }),
                 el('th', { texto: 'Base' }),
-                el('th', { texto: 'Responsable' }),
+                el('th', { texto: 'Responsables' }),
                 el('th', { texto: 'Prioridad' }),
                 el('th', { texto: 'Estado' }),
                 el('th', { texto: 'Vence' }),

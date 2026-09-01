@@ -10,7 +10,7 @@ import {
   haceCuanto, recortar, debounce
 } from '../util.js';
 
-import { ESTADOS, PRIORIDADES, ROL } from '../constantes.js';
+import { ESTADOS, PRIORIDADES } from '../constantes.js';
 import { puedeGestionarTareas, esOperador } from '../auth/sesion.js';
 import * as repoTareas from '../datos/repoTareas.js';
 
@@ -41,6 +41,7 @@ export function montarVistaTareas(contenedor, ctx) {
     categoriaId: '',
     prioridad: '',
     asignadoUid: '',
+    externoId: '',
     tablero: esOperador(usuario) ? 'abiertas' : 'abiertas'
   };
 
@@ -188,9 +189,7 @@ export function montarVistaTareas(contenedor, ctx) {
       const selAsignado = campoSelector({
         etiqueta: 'Asignada a',
         nombre: 'fAsig',
-        opciones: almacen.usuarios
-          .filter(u => u.rol !== ROL.ADMIN)
-          .map(u => ({ valor: u.id, texto: u.nombre })),
+        opciones: almacen.asignables().map(u => ({ valor: u.id, texto: u.nombre })),
         valor: filtros.asignadoUid,
         vacio: 'Cualquiera'
       });
@@ -200,6 +199,22 @@ export function montarVistaTareas(contenedor, ctx) {
         actualizarConteo();
       });
       zonaBarra.appendChild(selAsignado.nodo);
+
+      if (almacen.externos.length) {
+        const selExterno = campoSelector({
+          etiqueta: 'Ejecuta',
+          nombre: 'fExt',
+          opciones: almacen.externos.map(e => ({ valor: e.id, texto: e.nombre })),
+          valor: filtros.externoId,
+          vacio: 'Cualquiera'
+        });
+        selExterno.entrada.addEventListener('change', () => {
+          filtros.externoId = selExterno.valor();
+          dibujarLista();
+          actualizarConteo();
+        });
+        zonaBarra.appendChild(selExterno.nodo);
+      }
     }
 
     if (hayFiltros()) {
@@ -214,6 +229,7 @@ export function montarVistaTareas(contenedor, ctx) {
               filtros.categoriaId = '';
               filtros.prioridad = '';
               filtros.asignadoUid = '';
+              filtros.externoId = '';
               filtros.tablero = '';
               redibujar();
             }
@@ -250,6 +266,7 @@ export function montarVistaTareas(contenedor, ctx) {
       if (filtros.categoriaId && t.categoriaId !== filtros.categoriaId) return false;
       if (filtros.prioridad && t.prioridad !== filtros.prioridad) return false;
       if (filtros.asignadoUid && !(t.asignados && t.asignados[filtros.asignadoUid] === true)) return false;
+      if (filtros.externoId && !(t.externos && t.externos[filtros.externoId] === true)) return false;
       if (filtros.texto && !(contiene(t.titulo, filtros.texto) || contiene(t.descripcion, filtros.texto))) return false;
       return true;
     });
@@ -316,11 +333,14 @@ export function montarVistaTareas(contenedor, ctx) {
           ]),
           el('td', { dataset: { etiqueta: 'Categoria' } }, [chipCategoria(almacen.categoriaPorId[tarea.categoriaId])]),
           el('td', { dataset: { etiqueta: 'Estado' } }, [chipEstado(tarea.estado)]),
-          el('td', { dataset: { etiqueta: 'Asignada a' } }, [
-            el('div.asignados', {},
-              asignadosUid.length
+          el('td', { dataset: { etiqueta: 'Responsables' } }, [
+            el('div.asignados', {}, [
+              ...(asignadosUid.length
                 ? asignadosUid.map(uid => chipTenue(almacen.nombreUsuario(uid)))
-                : [chipTenue('Sin asignar')])
+                : [chipTenue('Sin asignar')]),
+              ...clavesActivas(tarea.externos).map(id =>
+                el('span.chip.chip-externo', { texto: almacen.nombreExterno(id) }))
+            ])
           ]),
           el('td', { dataset: { etiqueta: 'Vence' } }, [
             el('span', {
@@ -356,7 +376,7 @@ export function montarVistaTareas(contenedor, ctx) {
             el('th', { texto: 'Base' }),
             el('th', { texto: 'Categoria' }),
             el('th', { texto: 'Estado' }),
-            el('th', { texto: 'Asignada a' }),
+            el('th', { texto: 'Responsables' }),
             el('th', { texto: 'Vence' }),
             el('th', { texto: 'Actividad' }),
             el('th', { texto: '' })
@@ -381,9 +401,12 @@ export function montarVistaTareas(contenedor, ctx) {
       el('span.t', {}, [
         el('span.titulo', { texto: tarea.titulo }),
         el('span.meta', {
-          texto: asignadosUid.length
-            ? asignadosUid.map(uid => almacen.nombreUsuario(uid)).join(', ')
-            : 'Sin asignar'
+          texto: [
+            asignadosUid.length
+              ? asignadosUid.map(uid => almacen.nombreUsuario(uid)).join(', ')
+              : 'Sin asignar',
+            ...clavesActivas(tarea.externos).map(id => `ejecuta ${almacen.nombreExterno(id)}`)
+          ].join(' \u00b7 ')
         })
       ]),
       el('span', {}, [chipEstado(tarea.estado)]),

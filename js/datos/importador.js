@@ -142,7 +142,8 @@ export const CAMPOS_IMPORTABLES = [
   { id: 'baseId', nombre: 'Base', requerido: true },
   { id: 'titulo', nombre: 'Titulo de la tarea', requerido: true },
   { id: 'solicitante', nombre: 'Solicitante', requerido: false },
-  { id: 'asignados', nombre: 'Responsable', requerido: false },
+  { id: 'asignados', nombre: 'Interno de seguimiento', requerido: false },
+  { id: 'externos', nombre: 'Ejecuta (externo)', requerido: false },
   { id: 'prioridad', nombre: 'Prioridad', requerido: false },
   { id: 'estado', nombre: 'Estado', requerido: false },
   { id: 'categoriaId', nombre: 'Categoria', requerido: false },
@@ -197,6 +198,16 @@ export function buscarUsuario(valor, usuarios) {
     if (u) return u;
   }
   return null;
+}
+
+/** Busca el responsable externo por nombre o por empresa. */
+export function buscarExterno(valor, externos) {
+  const v = normalizar(valor);
+  if (!v) return null;
+  return externos.find(e => normalizar(e.nombre) === v)
+      || externos.find(e => normalizar(e.empresa) === v)
+      || (v.length >= 4 ? externos.find(e => normalizar(e.nombre).includes(v)) : null)
+      || null;
 }
 
 export function buscarCategoria(valor, categorias) {
@@ -273,11 +284,15 @@ function aISO(fecha) {
  *
  * @param {Array}  filas     filas crudas
  * @param {object} mapeo     { campo: indiceColumna }
- * @param {object} contexto  { bases, usuarios, categorias, tareasExistentes }
+ * @param {object} contexto  { bases, usuarios, categorias, externos,
+ *                             tareasExistentes, internoPorDefecto }
  * @returns {object} { resultados, resumen }
  */
 export function interpretar(filas, mapeo, contexto) {
-  const { bases = [], usuarios = [], categorias = [], tareasExistentes = [] } = contexto;
+  const {
+    bases = [], usuarios = [], categorias = [], externos = [],
+    tareasExistentes = [], internoPorDefecto = null
+  } = contexto;
 
   /* Indice de lo que ya existe, para detectar repetidos */
   const yaCargadas = new Set(
@@ -315,18 +330,53 @@ export function interpretar(filas, mapeo, contexto) {
     datos.solicitante = celda(fila, 'solicitante');
     datos.descripcion = celda(fila, 'descripcion');
 
-    /* Responsables */
-    const textoResp = celda(fila, 'asignados');
+    /* Responsables.
+       Las columnas de interno y externo se cruzan: es habitual que una
+       misma columna de la planilla mezcle gente de la empresa con
+       contratistas, asi que cada nombre se busca en las dos listas y
+       cae donde corresponda, avisando cuando no fue donde se esperaba. */
     datos.asignados = [];
-    if (textoResp) {
-      const nombres = textoResp.split(/[,;/]|\band\b|\by\b/).map(n => n.trim()).filter(Boolean);
+    datos.externos = [];
+
+    const repartir = (texto, esperado) => {
+      if (!texto) return;
+      const nombres = texto.split(/[,;/]|\band\b|\by\b/).map(n => n.trim()).filter(Boolean);
+
       for (const nombre of nombres) {
         const usuario = buscarUsuario(nombre, usuarios);
-        if (usuario) datos.asignados.push(usuario.id);
-        else errores.push(`no existe el usuario "${nombre}"`);
+        const externo = buscarExterno(nombre, externos);
+
+        if (esperado === 'interno') {
+          if (usuario) { datos.asignados.push(usuario.id); continue; }
+          if (externo) {
+            datos.externos.push(externo.id);
+            avisos.push(`"${nombre}" es un externo, se cargo como responsable de ejecucion`);
+            continue;
+          }
+          errores.push(`no existe el usuario "${nombre}"`);
+        } else {
+          if (externo) { datos.externos.push(externo.id); continue; }
+          if (usuario) {
+            datos.asignados.push(usuario.id);
+            avisos.push(`"${nombre}" es un usuario del sistema, se cargo como interno de seguimiento`);
+            continue;
+          }
+          errores.push(`no existe el responsable externo "${nombre}" ni un usuario con ese nombre`);
+        }
       }
-    } else {
-      avisos.push('sin responsable asignado');
+    };
+
+    repartir(celda(fila, 'asignados'), 'interno');
+    repartir(celda(fila, 'externos'), 'externo');
+
+    /* Toda tarea necesita un interno que pueda cargar avances */
+    if (!datos.asignados.length) {
+      if (internoPorDefecto) {
+        datos.asignados.push(internoPorDefecto);
+        avisos.push('sin interno en la planilla, queda el elegido por defecto');
+      } else {
+        errores.push('falta el interno a cargo del seguimiento');
+      }
     }
 
     /* Prioridad */
@@ -404,9 +454,9 @@ export function interpretar(filas, mapeo, contexto) {
 
 export function generarPlantillaCSV() {
   const filas = [
-    ['BASE OP', 'DESCRIPCION DE TAREA', 'SOLICITANTE', 'RESPONSABLE', 'PRIORIDAD', 'ESTADO', 'VENCIMIENTO', 'OBSERVACIONES'],
-    ['CERRO DRAGON', 'Refacciones vestuarios y banos', 'Carlos Garcia', 'Juan Cruz', 'ALTA', 'EN PROCESO', '30/09/2026', 'Estado al 90%'],
-    ['CO', 'Reponer toner impresora administracion', 'Ana Diaz', '', 'MEDIA', 'PENDIENTE', '', 'Modelo HP 26A']
+    ['BASE OP', 'DESCRIPCION DE TAREA', 'SOLICITANTE', 'RESPONSABLE INTERNO', 'RESPONSABLE', 'PRIORIDAD', 'ESTADO', 'VENCIMIENTO', 'OBSERVACIONES'],
+    ['CERRO DRAGON', 'Refacciones vestuarios y banos', 'Carlos Garcia', 'Miguel Lopez', 'DELTA', 'ALTA', 'EN PROCESO', '30/09/2026', 'Estado al 90%'],
+    ['CO', 'Reponer toner impresora administracion', 'Ana Diaz', 'Miguel Lopez', '', 'MEDIA', 'PENDIENTE', '', 'Modelo HP 26A']
   ];
   const texto = filas.map(f => f.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\r\n');
   return '\uFEFF' + texto;

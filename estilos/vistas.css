@@ -521,3 +521,38 @@
   .paso.activo .e { display: inline; }
   .pie-asistente .btn { flex: 1; min-height: var(--tactil); }
 }
+
+/* ==========================================================
+   Responsables externos
+   ========================================================== */
+.chip-externo {
+  color: #6B4E9B;
+  border-style: dashed;
+  background: #F4F0FA;
+}
+.casillas.fichas.externas .casilla { border-style: dashed; }
+.casillas.fichas.externas .casilla:has(input:checked) {
+  background: #F4F0FA;
+  border-color: #6B4E9B;
+  border-style: solid;
+  color: #553D7D;
+}
+
+.grupo-responsables + .grupo-responsables {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borde);
+}
+.grupo-responsables .rotulo {
+  display: block;
+  font-size: 11px;
+  color: var(--tinta-tenue);
+  margin-bottom: 4px;
+}
+
+.separador-campos {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+}
+.separador-campos .campo { margin-bottom: 0; max-width: 420px; }

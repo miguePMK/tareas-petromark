@@ -280,14 +280,27 @@ export function montarVistaDetalle(contenedor, ctx) {
       ])
     );
 
+    const externos = clavesActivas(tarea.externos);
+
     zonaLateral.appendChild(
       el('div.panel', {}, [
-        el('div.panel-titulo', {}, [el('h2', { texto: 'Asignada a' })]),
-        el('div.asignados', {},
-          asignados.length
-            ? asignados.map(uid => chipTenue(almacen.nombreUsuario(uid)))
-            : [chipTenue('Sin asignar')]
-        )
+        el('div.panel-titulo', {}, [el('h2', { texto: 'Responsables' })]),
+        el('div.grupo-responsables', {}, [
+          el('span.rotulo', { texto: 'Seguimiento interno' }),
+          el('div.asignados', {},
+            asignados.length
+              ? asignados.map(uid => chipTenue(almacen.nombreUsuario(uid)))
+              : [chipTenue('Sin asignar')]
+          )
+        ]),
+        externos.length
+          ? el('div.grupo-responsables', {}, [
+              el('span.rotulo', { texto: 'Ejecuta' }),
+              el('div.asignados', {},
+                externos.map(id => el('span.chip.chip-externo', { texto: almacen.nombreExterno(id) }))
+              )
+            ])
+          : null
       ])
     );
   }

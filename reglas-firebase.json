@@ -24,6 +24,12 @@
       ".indexOn": ["orden"]
     },
 
+    "externos": {
+      ".read": "auth != null",
+      ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'",
+      ".indexOn": ["nombre", "activo"]
+    },
+
     "usuarios": {
       ".read": "auth != null",
       ".indexOn": ["rol", "email", "activo"],

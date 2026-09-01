@@ -59,6 +59,7 @@ export async function crear(datos, uidAutor) {
     vencimiento: datos.vencimiento || null,
     estado: ESTADO.PENDIENTE,
     asignados: asignados,
+    externos: aMapa(datos.externos),
     creadaPor: uidAutor,
     creadaEn: serverTimestamp(),
     ultimaActividad: serverTimestamp(),
@@ -82,6 +83,7 @@ export async function actualizarDefinicion(id, datos, asignadosAnteriores) {
     prioridad: datos.prioridad || PRIORIDAD_POR_DEFECTO,
     vencimiento: datos.vencimiento || null,
     asignados: asignados,
+    externos: aMapa(datos.externos),
     ultimaActividad: serverTimestamp()
   });
 
@@ -151,6 +153,7 @@ export async function crearLote(lista, autor, alAvanzar) {
         vencimiento: datos.vencimiento || null,
         estado: estado,
         asignados: asignados,
+        externos: aMapa(datos.externos),
         creadaPor: autor.uid,
         creadaEn: serverTimestamp(),
         ultimaActividad: serverTimestamp(),

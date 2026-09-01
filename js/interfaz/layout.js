@@ -10,12 +10,14 @@ import { avisoError, confirmar } from './componentes.js';
 import * as repoBases from '../datos/repoBases.js';
 import * as repoCategorias from '../datos/repoCategorias.js';
 import * as repoUsuarios from '../datos/repoUsuarios.js';
+import * as repoExternos from '../datos/repoExternos.js';
 
 import { montarVistaTareas } from './vistaTareas.js';
 import { montarVistaDetalle } from './vistaDetalle.js';
 import { montarVistaBases } from './vistaBases.js';
 import { montarVistaUsuarios } from './vistaUsuarios.js';
 import { montarVistaCategorias } from './vistaCategorias.js';
+import { montarVistaExternos } from './vistaExternos.js';
 import { montarVistaImportar } from './vistaImportar.js';
 
 /* ----------------------------------------------------------
@@ -28,10 +30,12 @@ const almacen = {
   bases: [],
   categorias: [],
   usuarios: [],
+  externos: [],
   cuencaPorId: {},
   basePorId: {},
   categoriaPorId: {},
   usuarioPorId: {},
+  externoPorId: {},
   listo: false
 };
 
@@ -40,10 +44,12 @@ function reindexar() {
   almacen.basePorId = {};
   almacen.categoriaPorId = {};
   almacen.usuarioPorId = {};
+  almacen.externoPorId = {};
   for (const c of almacen.cuencas) almacen.cuencaPorId[c.id] = c;
   for (const b of almacen.bases) almacen.basePorId[b.id] = b;
   for (const c of almacen.categorias) almacen.categoriaPorId[c.id] = c;
   for (const u of almacen.usuarios) almacen.usuarioPorId[u.id] = u;
+  for (const e of almacen.externos) almacen.externoPorId[e.id] = e;
 }
 
 /** Nombre legible de la base, con su cuenca. */
@@ -58,6 +64,16 @@ almacen.textoCuencaDeBase = function (baseId) {
   if (!base) return '';
   const cuenca = almacen.cuencaPorId[base.cuencaId];
   return cuenca ? cuenca.codigo : '';
+};
+
+almacen.nombreExterno = function (id) {
+  const e = almacen.externoPorId[id];
+  if (!e) return 'Externo eliminado';
+  return e.empresa && e.empresa !== e.nombre ? `${e.nombre} (${e.empresa})` : e.nombre;
+};
+
+almacen.externosActivos = function () {
+  return almacen.externos.filter(e => e.activo !== false);
 };
 
 almacen.nombreUsuario = function (uid) {
@@ -80,9 +96,13 @@ almacen.operadores = function () {
   return almacen.usuarios.filter(u => u.activo !== false && u.rol === ROL.OPERADOR);
 };
 
-/** Personas asignables: operadores y, para tareas propias, tambien editores. */
+/**
+ * Personas a las que se puede asignar el seguimiento de una tarea:
+ * cualquier usuario activo, incluido el administrador. En equipos chicos
+ * el admin suele ser tambien quien ejecuta y reporta.
+ */
 almacen.asignables = function () {
-  return almacen.usuarios.filter(u => u.activo !== false && u.rol !== ROL.ADMIN);
+  return almacen.usuarios.filter(u => u.activo !== false);
 };
 
 /* ----------------------------------------------------------
@@ -100,6 +120,7 @@ const VISTAS = {
   bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
   usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
   categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true },
+  externos: { titulo: 'Externos', montar: montarVistaExternos, admin: true },
   importar: { titulo: 'Importar', montar: montarVistaImportar, admin: true }
 };
 
@@ -181,6 +202,7 @@ function dibujarNav(usuario) {
     agregar('bases');
     agregar('usuarios');
     agregar('categorias');
+    agregar('externos');
     agregar('importar');
   }
 }
@@ -209,6 +231,7 @@ function iniciarAlmacen(usuario) {
   desuscripciones.push(repoBases.escucharBases(lista => { almacen.bases = lista; refrescar(); }));
   desuscripciones.push(repoCategorias.escuchar(lista => { almacen.categorias = lista; refrescar(); }));
   desuscripciones.push(repoUsuarios.escuchar(lista => { almacen.usuarios = lista; refrescar(); }));
+  desuscripciones.push(repoExternos.escuchar(lista => { almacen.externos = lista; refrescar(); }));
 
   void usuario;
 }

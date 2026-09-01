@@ -82,17 +82,33 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
 
   const asignables = almacen.asignables();
   const asignados = campoCasillas({
-    etiqueta: 'Asignada a',
+    etiqueta: 'Interno a cargo del seguimiento',
     items: asignables.map(u => ({
       valor: u.id,
       texto: u.nombre,
       grupo: u.rol === 'editor' ? 'editor' : ''
     })),
     seleccionados: tarea ? clavesActivas(tarea.asignados) : [],
-    ayuda: 'Toca los nombres para asignar. Puede ser mas de una persona.'
+    ayuda: 'Quien puede cambiar el estado y cargar avances. Al menos una persona.'
   });
   asignados.nodo.classList.add('ancho-total');
   asignados.nodo.querySelector('.casillas').classList.add('fichas');
+
+  const externosDisponibles = almacen.externosActivos();
+  const externos = campoCasillas({
+    etiqueta: 'Ejecuta (externo)',
+    items: externosDisponibles.map(e => ({
+      valor: e.id,
+      texto: e.nombre,
+      grupo: e.empresa && e.empresa !== e.nombre ? e.empresa : ''
+    })),
+    seleccionados: tarea ? clavesActivas(tarea.externos) : [],
+    ayuda: externosDisponibles.length
+      ? 'Contratista o proveedor que hace el trabajo. No accede al sistema.'
+      : 'Todavia no hay externos cargados. Se crean en Administracion, seccion Externos.'
+  });
+  externos.nodo.classList.add('ancho-total');
+  externos.nodo.querySelector('.casillas').classList.add('fichas', 'externas');
 
   const zonaError = el('div');
   const botonGuardar = el('button.btn.btn-primario', {
@@ -114,7 +130,8 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
       prioridad.nodo,
       vencimiento.nodo,
       el('div.subtitulo', { texto: 'Responsables' }),
-      asignados.nodo
+      asignados.nodo,
+      externos.nodo
     ])
   ]);
 
@@ -131,7 +148,9 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     }
     const seleccion = asignados.valor();
     if (!seleccion.length) {
-      zonaError.appendChild(bloqueError('Asigna la tarea al menos a una persona.'));
+      zonaError.appendChild(bloqueError(
+        'Elegi al menos un interno a cargo del seguimiento. Sin eso, nadie puede cargar avances.'
+      ));
       return;
     }
 
@@ -143,7 +162,8 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
       categoriaId: categoria.valor() || null,
       prioridad: prioridad.valor(),
       vencimiento: vencimiento.entrada.value || null,
-      asignados: seleccion
+      asignados: seleccion,
+      externos: externos.valor()
     };
 
     botonGuardar.disabled = true;

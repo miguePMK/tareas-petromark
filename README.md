@@ -28,12 +28,12 @@ js/
     sesion.js             login, observador, bootstrap del primer admin
   datos/                  repositorios (interfaz async, sin UI)
     repoBases.js  repoCategorias.js  repoUsuarios.js
-    repoTareas.js  repoAvances.js  importador.js
+    repoTareas.js  repoAvances.js  repoExternos.js  importador.js
   interfaz/               presentacion (sin logica de negocio)
     componentes.js  login.js  layout.js  formTarea.js
     tablero.js      vistaTareas.js    vistaDetalle.js
     vistaBases.js   vistaUsuarios.js  vistaCategorias.js
-    vistaImportar.js
+    vistaExternos.js  vistaImportar.js
 assets/
   logo.png
 ```
@@ -112,7 +112,23 @@ de los tres roles.
   navegacion pasa al pie, pensada para el operador que actualiza desde el
   telefono.
 - **Detalle:** ficha, bitacora de avances y registro de nuevos avances.
-- **Bases, Usuarios, Categorias:** ABM, solo administrador.
+- **Bases, Usuarios, Categorias, Externos:** ABM, solo administrador.
+
+### Internos y externos
+
+Una tarea distingue dos roles:
+
+- **Interno a cargo del seguimiento** (`asignados`): usuarios con cuenta. Son los
+  unicos que, ademas de admin y editor, pueden cambiar el estado y cargar
+  avances. Toda tarea necesita al menos uno.
+- **Ejecuta** (`externos`): contratistas y proveedores del catalogo
+  `/externos`. No tienen cuenta, no inician sesion y no afectan permisos: son
+  datos descriptivos. Por eso las reglas de la base no los contemplan.
+
+Al importar, las columnas de interno y externo se cruzan: cada nombre se busca
+en las dos listas y cae donde corresponda, avisando cuando no fue donde se
+esperaba. Es habitual que una misma columna de la planilla mezcle personal
+propio con contratistas.
 - **Importar:** carga masiva desde planilla, solo administrador. Tres pasos:
   elegir archivo, asignar columnas y revisar. Nada se escribe hasta confirmar.
 
