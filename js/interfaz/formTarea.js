@@ -27,7 +27,7 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     nombre: 'titulo',
     valor: tarea ? tarea.titulo : '',
     maxlength: LARGO_MAXIMO_TITULO,
-    placeholder: 'Que hay que hacer',
+    placeholder: 'Que hay que hacer, en una linea',
     requerido: true
   });
 
@@ -69,7 +69,7 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     nombre: 'vencimiento',
     tipo: 'date',
     valor: tarea ? tarea.vencimiento || '' : '',
-    ayuda: 'Se puede dejar vacio si la tarea no vence.'
+    ayuda: 'Vacio = sin vencimiento.'
   });
 
   const asignables = almacen.asignables();
@@ -81,20 +81,32 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
       grupo: u.rol === 'editor' ? 'editor' : ''
     })),
     seleccionados: tarea ? clavesActivas(tarea.asignados) : [],
-    ayuda: 'Se puede asignar a mas de una persona.'
+    ayuda: 'Toca los nombres para asignar. Puede ser mas de una persona.'
   });
+  asignados.nodo.classList.add('ancho-total');
+  asignados.nodo.querySelector('.casillas').classList.add('fichas');
 
   const zonaError = el('div');
   const botonGuardar = el('button.btn.btn-primario', {
     texto: esNueva ? 'Crear tarea' : 'Guardar cambios'
   });
 
+  titulo.nodo.classList.add('ancho-total');
+  descripcion.nodo.classList.add('ancho-total');
+
   const cuerpo = el('div', {}, [
     zonaError,
-    titulo.nodo,
-    descripcion.nodo,
-    el('div.grilla-campos', {}, [base.nodo, categoria.nodo, prioridad.nodo, vencimiento.nodo]),
-    asignados.nodo
+    el('div.form-tarea', {}, [
+      titulo.nodo,
+      descripcion.nodo,
+      el('div.subtitulo', { texto: 'Ubicacion y clasificacion' }),
+      base.nodo,
+      categoria.nodo,
+      prioridad.nodo,
+      vencimiento.nodo,
+      el('div.subtitulo', { texto: 'Responsables' }),
+      asignados.nodo
+    ])
   ]);
 
   botonGuardar.addEventListener('click', async () => {

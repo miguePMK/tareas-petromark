@@ -242,7 +242,7 @@ export function montarVistaTareas(contenedor, ctx) {
       const fila = el('tr.clickeable', {
         on: { click: () => ir('detalle', { id: tarea.id }) }
       }, [
-        el('td', {}, [
+        el('td.celda-principal', {}, [
           el('div.tit-tarea', {}, [
             marcaPrioridad(tarea.prioridad),
             el('div', {}, [
@@ -253,29 +253,29 @@ export function montarVistaTareas(contenedor, ctx) {
             ])
           ])
         ]),
-        el('td', {}, [
+        el('td', { dataset: { etiqueta: 'Base' } }, [
           el('div', {}, [
             el('span.codigo-base', { texto: (almacen.basePorId[tarea.baseId] || {}).codigo || '?' }),
             el('span', { texto: ' ' + almacen.textoBase(tarea.baseId) })
           ]),
           el('div.secundario', { texto: almacen.textoCuencaDeBase(tarea.baseId) })
         ]),
-        el('td', {}, [chipCategoria(almacen.categoriaPorId[tarea.categoriaId])]),
-        el('td', {}, [chipEstado(tarea.estado)]),
-        el('td', {}, [
+        el('td', { dataset: { etiqueta: 'Categoria' } }, [chipCategoria(almacen.categoriaPorId[tarea.categoriaId])]),
+        el('td', { dataset: { etiqueta: 'Estado' } }, [chipEstado(tarea.estado)]),
+        el('td', { dataset: { etiqueta: 'Asignada a' } }, [
           el('div.asignados', {},
             asignadosUid.length
               ? asignadosUid.map(uid => chipTenue(almacen.nombreUsuario(uid)))
               : [chipTenue('Sin asignar')]
           )
         ]),
-        el('td', {}, [
+        el('td', { dataset: { etiqueta: 'Vence' } }, [
           el('span', {
             texto: textoVencimiento(tarea.vencimiento),
             clase: claseVencimiento(tarea.vencimiento, estado.abierto)
           })
         ]),
-        el('td', {}, [
+        el('td', { dataset: { etiqueta: 'Actividad' } }, [
           el('span.secundario', { texto: haceCuanto(tarea.ultimaActividad || tarea.creadaEn) })
         ]),
         el('td.col-acciones', {}, [
@@ -316,7 +316,7 @@ export function montarVistaTareas(contenedor, ctx) {
 
     zonaTabla.appendChild(
       el('div.tabla-marco', {}, [
-        el('table.tabla', {}, [
+        el('table.tabla.tabla-tarjetas', {}, [
           el('thead', {}, [
             el('tr', {}, [
               el('th', { texto: 'Tarea' }),

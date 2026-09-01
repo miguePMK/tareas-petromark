@@ -4,8 +4,6 @@
 
 /* ==========================================================
    Ingreso y primer arranque
-   La pantalla de acceso queda sobre el marron de marca:
-   es el unico momento en que la identidad ocupa todo.
    ========================================================== */
 .pantalla-ingreso {
   min-height: 100vh;
@@ -18,43 +16,35 @@
   width: 100%;
   max-width: 356px;
   background: var(--panel);
-  border-radius: 6px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
   padding: 26px 24px 22px;
 }
 .caja-ingreso .marca {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; margin-bottom: 20px; text-align: center;
 }
 .caja-ingreso .marca img { width: 54px; height: 54px; }
 .caja-ingreso .marca .titulo { font-size: 16px; font-weight: 600; }
 .caja-ingreso .marca .sub { font-size: 12px; color: var(--tinta-tenue); }
-.caja-ingreso .btn-primario { width: 100%; margin-top: 4px; padding: 9px; }
+.caja-ingreso .btn-primario { width: 100%; margin-top: 4px; padding: 10px; min-height: var(--tactil); }
 .caja-ingreso .pie { margin: 16px 0 0; text-align: center; font-size: 11px; color: var(--tinta-tenue); }
 .caja-ingreso .nota {
-  margin-bottom: 16px;
-  padding: 10px 12px;
+  margin-bottom: 16px; padding: 10px 12px;
   background: var(--acento-tinte);
   border: 1px solid var(--acento-borde);
   border-radius: var(--radio);
-  font-size: 12.5px;
-  color: var(--tinta-media);
+  font-size: 12.5px; color: var(--tinta-media);
 }
 .caja-ingreso .ficha { font-size: 12px; }
+@media (max-width: 760px) {
+  .caja-ingreso input { font-size: 16px; min-height: 40px; }
+}
 
 /* ==========================================================
-   Resumen por estado: fila de pildoras filtrantes
+   Resumen por estado
    ========================================================== */
-.resumen {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
+.resumen { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .resumen-item {
   display: inline-flex;
   align-items: baseline;
@@ -70,13 +60,14 @@
   box-shadow: var(--sombra-baja);
 }
 .resumen-item:hover { border-color: var(--tinta-tenue); color: var(--tinta); }
-.resumen-item.activo {
-  background: var(--tinta);
-  border-color: var(--tinta);
-  color: #FFFFFF;
-}
+.resumen-item.activo { background: var(--tinta); border-color: var(--tinta); color: #FFFFFF; }
 .resumen-item .n { font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .resumen-item .e { font-size: 12px; }
+@media (max-width: 760px) {
+  .resumen { gap: 5px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; scrollbar-width: none; }
+  .resumen::-webkit-scrollbar { display: none; }
+  .resumen-item { flex: 0 0 auto; min-height: 36px; align-items: center; }
+}
 
 /* ==========================================================
    Fila de tarea
@@ -84,6 +75,119 @@
 .tit-tarea { display: flex; align-items: center; gap: 9px; }
 .marca-prioridad { width: 3px; height: 26px; border-radius: 2px; flex: 0 0 auto; }
 .asignados { display: flex; flex-wrap: wrap; gap: 3px; }
+@media (max-width: 760px) {
+  .marca-prioridad { height: 30px; width: 4px; }
+}
+
+/* ==========================================================
+   Vista por base: acordeones
+   ========================================================== */
+.cuenca-bloque { margin-bottom: 16px; }
+.cuenca-titulo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 8px;
+  padding-left: 10px;
+  border-left: 4px solid var(--acento);
+  font-size: 14px;
+  font-weight: 600;
+}
+.cuenca-titulo .codigo {
+  font-family: var(--fuente-mono);
+  font-size: 11.5px;
+  color: var(--tinta-tenue);
+  font-weight: 400;
+}
+.cuenca-titulo .total { margin-left: auto; font-size: 12px; color: var(--tinta-tenue); font-weight: 400; }
+
+.acordeon {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-g);
+  margin-bottom: 7px;
+  overflow: hidden;
+}
+.acordeon[open] { border-color: var(--acento-borde); box-shadow: var(--sombra-baja); }
+
+.acordeon > summary {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 13px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.acordeon > summary::-webkit-details-marker { display: none; }
+.acordeon > summary:hover { background: var(--panel-tenue); }
+
+.acordeon .flecha {
+  flex: 0 0 auto;
+  width: 13px;
+  color: var(--tinta-tenue);
+  transition: transform 0.14s ease;
+  font-size: 11px;
+}
+.acordeon[open] .flecha { transform: rotate(90deg); color: var(--acento); }
+
+.acordeon .nombre-base { font-weight: 600; }
+.acordeon .datos-base { min-width: 0; flex: 1; }
+.acordeon .sin-abiertas { font-size: 11.5px; color: var(--tinta-tenue); font-weight: 400; }
+
+/* Barra apilada con la distribucion de estados */
+.barra-estados {
+  display: flex;
+  width: 132px;
+  height: 7px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--borde);
+  flex: 0 0 auto;
+}
+.barra-estados span { display: block; height: 100%; }
+
+.acordeon .conteos { display: flex; gap: 4px; flex: 0 0 auto; }
+.contador {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-media);
+}
+.contador .punto { width: 6px; height: 6px; border-radius: 50%; }
+
+.acordeon .cuerpo { border-top: 1px solid var(--borde); }
+
+.tarea-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 13px 8px 30px;
+  border-bottom: 1px solid #EDF1F4;
+  cursor: pointer;
+  width: 100%;
+  background: transparent;
+  border-left: 0; border-right: 0; border-top: 0;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+}
+.tarea-mini:last-child { border-bottom: 0; }
+.tarea-mini:hover { background: var(--acento-tinte); }
+.tarea-mini .t { flex: 1; min-width: 0; font-size: 13px; }
+.tarea-mini .t .titulo { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tarea-mini .t .meta { font-size: 11.5px; color: var(--tinta-tenue); }
+.tarea-mini .venc { font-size: 11.5px; color: var(--tinta-tenue); flex: 0 0 auto; }
+
+@media (max-width: 760px) {
+  .acordeon > summary { flex-wrap: wrap; gap: 8px; padding: 11px 12px; min-height: var(--tactil); }
+  .barra-estados { width: 100%; order: 3; }
+  .acordeon .conteos { order: 2; margin-left: auto; }
+  .tarea-mini { flex-wrap: wrap; padding: 10px 12px; min-height: var(--tactil); }
+  .tarea-mini .venc { width: 100%; }
+}
 
 /* ==========================================================
    Detalle de tarea
@@ -94,11 +198,9 @@
   gap: 14px;
   align-items: start;
 }
-@media (max-width: 1000px) {
-  .detalle { grid-template-columns: minmax(0, 1fr); }
-}
 .detalle > div:last-child { position: sticky; top: 22px; }
 @media (max-width: 1000px) {
+  .detalle { grid-template-columns: minmax(0, 1fr); }
   .detalle > div:last-child { position: static; }
 }
 
@@ -116,27 +218,22 @@
 .ficha dd { margin: 0; }
 
 /* ==========================================================
-   Bitacora de avances
+   Bitacora
    ========================================================== */
 .avances { position: relative; margin-top: 2px; padding-left: 18px; }
 .avances::before {
   content: "";
   position: absolute;
-  left: 3px;
-  top: 7px;
-  bottom: 7px;
-  width: 1px;
-  background: var(--borde);
+  left: 3px; top: 7px; bottom: 7px;
+  width: 1px; background: var(--borde);
 }
 .avance { position: relative; padding: 0 0 16px; }
 .avance:last-child { padding-bottom: 0; }
 .avance::before {
   content: "";
   position: absolute;
-  left: -18px;
-  top: 5px;
-  width: 7px;
-  height: 7px;
+  left: -18px; top: 5px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--panel);
   border: 2px solid var(--acento);
@@ -154,10 +251,39 @@
 }
 .avance .texto { white-space: pre-wrap; color: var(--tinta-media); max-width: 70ch; line-height: 1.55; }
 
-.form-avance textarea { min-height: 62px; }
+.form-avance textarea { min-height: 66px; }
 .form-avance .fila { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 .form-avance .fila .campo { flex: 0 1 190px; margin: 0; }
 .form-avance .ayuda { display: block; margin-top: 7px; font-size: 11.5px; color: var(--alerta); }
+
+@media (max-width: 760px) {
+  .detalle-titulo { font-size: 17px; }
+  .form-avance textarea { font-size: 16px; }
+  .form-avance .fila { gap: 8px; }
+  .form-avance .fila .campo { flex: 1 1 100%; }
+  .form-avance .fila select { min-height: var(--tactil); font-size: 16px; }
+  .form-avance .fila .btn-primario { width: 100%; min-height: var(--tactil); font-size: 13.5px; }
+}
+
+/* ==========================================================
+   Formulario de tarea
+   ========================================================== */
+.form-tarea { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.form-tarea .ancho-total { grid-column: 1 / -1; }
+.form-tarea .subtitulo {
+  grid-column: 1 / -1;
+  margin: 4px 0 9px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+  font-size: 12px;
+  color: var(--tinta-tenue);
+}
+.form-tarea .subtitulo:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+@media (max-width: 620px) {
+  .form-tarea { grid-template-columns: minmax(0, 1fr); }
+  .form-tarea input, .form-tarea select, .form-tarea textarea { font-size: 16px; }
+  .form-tarea input, .form-tarea select { min-height: var(--tactil); }
+}
 
 /* ==========================================================
    ABM
@@ -186,8 +312,7 @@
 .inactivo { color: var(--tinta-tenue); }
 .inactivo .principal { color: var(--tinta-tenue); font-weight: 400; }
 .muestra-color {
-  width: 11px;
-  height: 11px;
+  width: 11px; height: 11px;
   border-radius: 2px;
   border: 1px solid rgba(0, 0, 0, 0.14);
   display: inline-block;

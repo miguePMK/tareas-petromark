@@ -12,6 +12,7 @@ import * as repoCategorias from '../datos/repoCategorias.js';
 import * as repoUsuarios from '../datos/repoUsuarios.js';
 
 import { montarVistaTareas } from './vistaTareas.js';
+import { montarVistaPorBase } from './vistaPorBase.js';
 import { montarVistaDetalle } from './vistaDetalle.js';
 import { montarVistaBases } from './vistaBases.js';
 import { montarVistaUsuarios } from './vistaUsuarios.js';
@@ -95,6 +96,7 @@ let desuscripciones = [];
 
 const VISTAS = {
   tareas: { titulo: 'Tareas', montar: montarVistaTareas, admin: false },
+  porBase: { titulo: 'Por base', montar: montarVistaPorBase, admin: false },
   detalle: { titulo: 'Detalle de tarea', montar: montarVistaDetalle, admin: false, oculta: true },
   bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
   usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
@@ -173,6 +175,7 @@ function dibujarNav(usuario) {
   };
 
   agregar('tareas');
+  agregar('porBase');
 
   if (puedeAdministrar(usuario)) {
     navNodo.appendChild(el('div.separador', { texto: 'Administracion' }));

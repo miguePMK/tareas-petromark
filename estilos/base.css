@@ -1,34 +1,34 @@
 /* ==========================================================
-   base.css - Tokens, marco de la aplicacion y riel lateral
-   Contenido claro, riel oscuro con la identidad Petromark.
+   base.css - Tokens, marco y riel lateral
+   Contenido claro, riel en azul pizarra.
    ========================================================== */
 
 :root {
-  /* ---- Riel oscuro (marca) ---- */
-  --riel:            #1B1510;
-  --riel-alto:       #262019;
-  --riel-borde:      #372C22;
-  --riel-texto:      #CFC6BC;
-  --riel-tenue:      #8B8075;
-  --riel-acento:     #4DA9CE;
+  /* ---- Riel ---- */
+  --riel:            #22303F;
+  --riel-alto:       #2E4054;
+  --riel-borde:      #3A4E63;
+  --riel-texto:      #C6D2DC;
+  --riel-tenue:      #8A9BAA;
+  --riel-acento:     #56C1DE;
 
-  /* ---- Superficies claras ---- */
-  --fondo:           #EDF0F2;
+  /* ---- Superficies ---- */
+  --fondo:           #F2F5F7;
   --panel:           #FFFFFF;
-  --panel-tenue:     #F6F8F9;
-  --borde:           #D7DDE2;
-  --borde-fuerte:    #BFC9D1;
+  --panel-tenue:     #F7F9FA;
+  --borde:           #E1E7EC;
+  --borde-fuerte:    #C7D1D9;
 
   /* ---- Tinta ---- */
-  --tinta:           #17222C;
-  --tinta-media:     #4B5B68;
-  --tinta-tenue:     #7A8894;
+  --tinta:           #1B2A36;
+  --tinta-media:     #4E6273;
+  --tinta-tenue:     #8496A4;
 
-  /* ---- Acento: azul petroleo profundo ---- */
-  --acento:          #10627C;
-  --acento-hover:    #0C4F65;
-  --acento-tinte:    #E2EFF4;
-  --acento-borde:    #A9CEDC;
+  /* ---- Acento ---- */
+  --acento:          #0E7490;
+  --acento-hover:    #0B5E76;
+  --acento-tinte:    #E6F4F8;
+  --acento-borde:    #A5D5E4;
 
   /* ---- Semanticos ---- */
   --alerta:          #9A6206;
@@ -38,16 +38,18 @@
   --fuente: "Segoe UI", "Segoe UI Variable", Tahoma, Verdana, sans-serif;
   --fuente-mono: Consolas, "Courier New", monospace;
 
-  --radio: 3px;
-  --radio-g: 5px;
-  --ancho-riel: 208px;
-  --sombra: 0 10px 34px rgba(15, 28, 38, 0.22);
-  --sombra-baja: 0 1px 2px rgba(15, 28, 38, 0.06);
+  --radio: 4px;
+  --radio-g: 7px;
+  --ancho-riel: 210px;
+  --sombra: 0 12px 36px rgba(20, 38, 52, 0.20);
+  --sombra-baja: 0 1px 2px rgba(20, 38, 52, 0.05);
+
+  /* Alto minimo de zona tactil en telefono */
+  --tactil: 42px;
 }
 
 * { box-sizing: border-box; }
 
-/* El atributo hidden tiene que ganarle a cualquier display de clase. */
 [hidden] { display: none !important; }
 
 html, body { margin: 0; padding: 0; height: 100%; }
@@ -59,6 +61,7 @@ body {
   font-size: 13.5px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
 }
 
 h1, h2, h3 { margin: 0; font-weight: 600; }
@@ -72,12 +75,11 @@ a:hover { text-decoration: underline; }
 
 code, pre, .mono { font-family: var(--fuente-mono); }
 ::selection { background: var(--acento); color: #FFFFFF; }
-
 :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #C3CDD4; border-radius: 5px; border: 2px solid var(--fondo); }
+::-webkit-scrollbar-thumb { background: #C7D2DA; border-radius: 5px; border: 2px solid var(--fondo); }
 ::-webkit-scrollbar-thumb:hover { background: var(--tinta-tenue); }
 
 /* ==========================================================
@@ -98,7 +100,7 @@ code, pre, .mono { font-family: var(--fuente-mono); }
 .pantalla-carga p { color: var(--riel-tenue); font-size: 12.5px; margin: 0; }
 
 /* ==========================================================
-   Marco: riel a la izquierda, contenido a la derecha
+   Marco
    ========================================================== */
 .app { min-height: 100%; }
 
@@ -124,7 +126,7 @@ code, pre, .mono { font-family: var(--fuente-mono); }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 16px 16px;
+  padding: 0 16px 15px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--riel-borde);
 }
@@ -138,7 +140,7 @@ code, pre, .mono { font-family: var(--fuente-mono); }
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 7px 10px;
+  padding: 8px 10px;
   border: 0;
   border-radius: var(--radio);
   background: transparent;
@@ -162,12 +164,7 @@ code, pre, .mono { font-family: var(--fuente-mono); }
   background: var(--riel-acento);
 }
 
-.riel .separador {
-  margin: 14px 10px 5px;
-  font-size: 11px;
-  color: var(--riel-tenue);
-}
-
+.riel .separador { margin: 14px 10px 5px; font-size: 11px; color: var(--riel-tenue); }
 .riel-espacio { flex: 1; min-height: 16px; }
 
 .riel-usuario {
@@ -180,39 +177,27 @@ code, pre, .mono { font-family: var(--fuente-mono); }
 }
 .riel-usuario .datos { min-width: 0; flex: 1; line-height: 1.25; }
 .riel-usuario .n {
-  color: #FFFFFF;
-  font-size: 12.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #FFFFFF; font-size: 12.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .riel-usuario .r { color: var(--riel-acento); font-size: 11px; }
 .riel-usuario .salir {
-  border: 0;
-  background: transparent;
-  color: var(--riel-tenue);
-  font-family: inherit;
-  font-size: 12px;
-  padding: 4px 6px;
-  border-radius: var(--radio);
-  cursor: pointer;
+  border: 0; background: transparent; color: var(--riel-tenue);
+  font-family: inherit; font-size: 12px; padding: 5px 7px;
+  border-radius: var(--radio); cursor: pointer;
 }
 .riel-usuario .salir:hover { background: var(--riel-alto); color: #FFFFFF; }
 
 .riel .version { padding: 8px 18px 0; font-size: 10.5px; color: var(--riel-tenue); }
 
 .inicial {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
+  width: 28px; height: 28px; flex: 0 0 auto;
   border-radius: 50%;
-  background: rgba(77, 169, 206, 0.16);
-  border: 1px solid rgba(77, 169, 206, 0.45);
+  background: rgba(86, 193, 222, 0.16);
+  border: 1px solid rgba(86, 193, 222, 0.45);
   color: var(--riel-acento);
-  display: grid;
-  place-items: center;
-  font-weight: 600;
-  font-size: 11.5px;
+  display: grid; place-items: center;
+  font-weight: 600; font-size: 11.5px;
 }
 
 /* ---------- Contenido ---------- */
@@ -229,36 +214,66 @@ code, pre, .mono { font-family: var(--fuente-mono); }
 .cabecera-vista .acciones { margin-left: auto; display: flex; gap: 7px; }
 
 /* ==========================================================
-   Responsive: el riel pasa arriba
+   Tableta: riel mas angosto
    ========================================================== */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  :root { --ancho-riel: 178px; }
+  .contenido { padding: 18px 18px 38px; }
+}
+
+/* ==========================================================
+   Telefono: el riel pasa arriba
+   ========================================================== */
+@media (max-width: 760px) {
   .marco { grid-template-columns: minmax(0, 1fr); }
+
   .riel {
-    position: static;
+    position: sticky;
+    top: 0;
+    z-index: 40;
     height: auto;
-    padding: 10px 0;
+    padding: 9px 0 0;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 0 10px;
+    box-shadow: 0 2px 10px rgba(20, 38, 52, 0.18);
   }
   .riel-marca { border-bottom: 0; padding: 0 12px; margin: 0; }
   .riel-marca .sub { display: none; }
+
   .riel nav {
     grid-column: 1 / -1;
     flex-direction: row;
     overflow-x: auto;
+    scrollbar-width: none;
     padding: 8px 12px 0;
     gap: 4px;
   }
-  .riel nav button { width: auto; white-space: nowrap; }
-  .riel nav button.activo::before { left: 0; right: 0; top: auto; bottom: -4px; width: auto; height: 2px; border-radius: 2px; }
+  .riel nav::-webkit-scrollbar { display: none; }
+  .riel nav button {
+    width: auto;
+    white-space: nowrap;
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+  .riel nav button.activo::before {
+    left: 0; right: 0; top: auto; bottom: -8px;
+    width: auto; height: 3px; border-radius: 3px 3px 0 0;
+  }
   .riel .separador { display: none; }
   .riel-espacio { display: none; }
-  .riel-usuario { border-top: 0; padding: 0 12px; margin: 0; }
+  .riel-usuario { border-top: 0; padding: 0 12px; margin: 0; gap: 6px; }
   .riel-usuario .datos { display: none; }
+  .riel-usuario .salir { min-height: var(--tactil); display: flex; align-items: center; }
   .riel .version { display: none; }
-  .contenido { padding: 16px 14px 34px; }
+
+  .contenido { padding: 14px 12px 40px; }
+
+  h1 { font-size: 17px; }
+  .cabecera-vista { gap: 10px; margin-bottom: 12px; }
+  .cabecera-vista .acciones { width: 100%; margin-left: 0; }
+  .cabecera-vista .acciones .btn { flex: 1; min-height: var(--tactil); }
 }
 
 @media (prefers-reduced-motion: reduce) {

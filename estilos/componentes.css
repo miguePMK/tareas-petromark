@@ -1,5 +1,5 @@
 /* ==========================================================
-   componentes.css - Controles sobre superficie clara
+   componentes.css - Controles reutilizables
    ========================================================== */
 
 /* ==========================================================
@@ -22,7 +22,7 @@
   transition: background 0.1s ease, border-color 0.1s ease;
 }
 .btn:hover { background: var(--panel-tenue); border-color: var(--tinta-tenue); }
-.btn:active { background: #EDF1F3; }
+.btn:active { background: #EBF0F3; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 .btn-primario {
@@ -37,15 +37,15 @@
 .btn-peligro:hover { background: var(--error-tinte); border-color: var(--error); }
 
 .btn-plano { background: transparent; border-color: transparent; box-shadow: none; color: var(--tinta-media); }
-.btn-plano:hover { background: #E3E8EC; color: var(--tinta); }
+.btn-plano:hover { background: #E5EBEF; color: var(--tinta); }
 
 .btn-chico { padding: 3px 8px; font-size: 12px; }
-.btn-icono { padding: 4px 7px; }
+.btn-icono { padding: 4px 8px; }
 
 /* ==========================================================
    Campos
    ========================================================== */
-.campo { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.campo { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; min-width: 0; }
 .campo > label { font-size: 12px; color: var(--tinta-media); font-weight: 600; }
 .campo .ayuda { font-size: 11.5px; color: var(--tinta-tenue); }
 
@@ -58,7 +58,7 @@
 .campo textarea,
 .entrada {
   width: 100%;
-  padding: 6px 9px;
+  padding: 7px 9px;
   background: var(--panel);
   border: 1px solid var(--borde-fuerte);
   border-radius: var(--radio);
@@ -66,18 +66,15 @@
   font-family: inherit;
   font-size: 13px;
 }
-.campo textarea { resize: vertical; min-height: 72px; line-height: 1.45; }
+.campo textarea { resize: vertical; min-height: 76px; line-height: 1.45; }
 .campo input:focus, .campo select:focus, .campo textarea:focus, .entrada:focus {
   border-color: var(--acento);
   outline: none;
   box-shadow: 0 0 0 3px var(--acento-tinte);
 }
-.campo input:disabled, .campo select:disabled {
-  background: var(--panel-tenue);
-  color: var(--tinta-tenue);
-}
+.campo input:disabled, .campo select:disabled { background: var(--panel-tenue); color: var(--tinta-tenue); }
 .campo select { cursor: pointer; }
-.campo input::placeholder, .campo textarea::placeholder { color: #A3AEB8; }
+.campo input::placeholder, .campo textarea::placeholder { color: #A6B2BC; }
 
 .grilla-campos {
   display: grid;
@@ -85,6 +82,7 @@
   gap: 0 12px;
 }
 
+/* ---------- Casillas ---------- */
 .casillas {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
@@ -100,14 +98,39 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 3px 5px;
+  padding: 4px 6px;
   border-radius: var(--radio);
   font-size: 12.5px;
   cursor: pointer;
 }
-.casilla:hover { background: #E7ECEF; }
+.casilla:hover { background: #E9EEF1; }
 .casilla input { accent-color: var(--acento); margin: 0; }
 .casilla .grupo { color: var(--tinta-tenue); font-size: 11px; margin-left: auto; }
+
+/* Variante ficha: para elegir personas de un vistazo */
+.casillas.fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  max-height: 168px;
+}
+.casillas.fichas .casilla {
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 999px;
+  background: var(--panel);
+  padding: 5px 12px 5px 9px;
+}
+.casillas.fichas .casilla:hover { border-color: var(--acento); background: var(--panel); }
+.casillas.fichas .casilla:has(input:checked) {
+  background: var(--acento-tinte);
+  border-color: var(--acento);
+  color: var(--acento-hover);
+  font-weight: 600;
+}
+.casillas.fichas .grupo { margin-left: 2px; }
 
 /* ==========================================================
    Paneles
@@ -153,11 +176,7 @@ table.tabla th {
   top: 0;
   z-index: 1;
 }
-table.tabla td {
-  padding: 7px 12px;
-  border-bottom: 1px solid #EBEEF1;
-  vertical-align: middle;
-}
+table.tabla td { padding: 7px 12px; border-bottom: 1px solid #EDF1F4; vertical-align: middle; }
 table.tabla tbody tr:last-child td { border-bottom: 0; }
 table.tabla tbody tr:hover { background: var(--acento-tinte); }
 table.tabla .col-acciones { text-align: right; white-space: nowrap; }
@@ -165,12 +184,58 @@ table.tabla .clickeable { cursor: pointer; }
 table.tabla .principal { font-weight: 600; color: var(--tinta); }
 table.tabla .secundario { color: var(--tinta-tenue); font-size: 11.5px; }
 
-/* Las acciones de fila aparecen al pasar por encima, para no saturar */
 table.tabla tbody .col-acciones .btn { opacity: 0; }
 table.tabla tbody tr:hover .col-acciones .btn,
 table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
-@media (hover: none) {
-  table.tabla tbody .col-acciones .btn { opacity: 1; }
+@media (hover: none) { table.tabla tbody .col-acciones .btn { opacity: 1; } }
+
+/* ==========================================================
+   Tabla que se vuelve tarjetas en telefono
+   Se aplica solo a .tabla-tarjetas (el listado de tareas).
+   ========================================================== */
+@media (max-width: 760px) {
+  .tabla-tarjetas thead { display: none; }
+  .tabla-tarjetas, .tabla-tarjetas tbody, .tabla-tarjetas tr, .tabla-tarjetas td { display: block; width: 100%; }
+
+  .tabla-tarjetas tr {
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--borde);
+  }
+  .tabla-tarjetas tbody tr:hover { background: transparent; }
+  .tabla-tarjetas tbody tr:active { background: var(--acento-tinte); }
+
+  .tabla-tarjetas td { border: 0; padding: 3px 0; }
+
+  .tabla-tarjetas td[data-etiqueta] {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+  .tabla-tarjetas td[data-etiqueta]::before {
+    content: attr(data-etiqueta);
+    flex: 0 0 74px;
+    color: var(--tinta-tenue);
+    font-size: 11px;
+  }
+
+  .tabla-tarjetas td.celda-principal { padding-bottom: 7px; }
+  .tabla-tarjetas td.celda-principal::before { display: none; }
+  .tabla-tarjetas .principal { font-size: 14px; }
+
+  .tabla-tarjetas td.col-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 9px;
+    text-align: left;
+  }
+  .tabla-tarjetas td.col-acciones .btn {
+    flex: 1;
+    opacity: 1;
+    min-height: var(--tactil);
+    font-size: 13px;
+    margin: 0 !important;
+  }
 }
 
 /* ==========================================================
@@ -183,8 +248,8 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   padding: 1px 8px;
   border-radius: 3px;
   border: 1px solid;
-  border-color: color-mix(in srgb, currentColor 32%, transparent);
-  background: color-mix(in srgb, currentColor 9%, #FFFFFF);
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+  background: color-mix(in srgb, currentColor 10%, #FFFFFF);
   font-size: 11.5px;
   font-weight: 600;
   white-space: nowrap;
@@ -203,7 +268,7 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
 .hoy { color: var(--alerta); font-weight: 600; }
 
 /* ==========================================================
-   Avisos flotantes
+   Avisos
    ========================================================== */
 .capa-avisos {
   position: fixed;
@@ -233,6 +298,10 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
+@media (max-width: 760px) {
+  .capa-avisos { right: 10px; left: 10px; bottom: 10px; }
+  .aviso { max-width: none; }
+}
 
 /* ==========================================================
    Modal
@@ -240,11 +309,11 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
 .capa-modal {
   position: fixed;
   inset: 0;
-  background: rgba(20, 32, 42, 0.42);
+  background: rgba(20, 38, 52, 0.45);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 46px 16px;
+  padding: 44px 16px;
   overflow-y: auto;
   z-index: 250;
 }
@@ -256,7 +325,7 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   box-shadow: var(--sombra);
   animation: entrar-modal 0.14s ease-out;
 }
-.modal.ancho { max-width: 740px; }
+.modal.ancho { max-width: 720px; }
 @keyframes entrar-modal {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: none; }
@@ -268,7 +337,7 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   padding: 13px 17px;
   border-bottom: 1px solid var(--borde);
 }
-.modal-cabecera h2 { flex: 1; font-size: 14.5px; }
+.modal-cabecera h2 { flex: 1; font-size: 15px; }
 .modal-cuerpo { padding: 17px; }
 .modal-pie {
   display: flex;
@@ -280,10 +349,27 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   border-radius: 0 0 var(--radio-g) var(--radio-g);
 }
 
+/* En telefono el modal ocupa la pantalla y el pie queda fijo abajo */
+@media (max-width: 760px) {
+  .capa-modal { padding: 0; }
+  .modal, .modal.ancho {
+    max-width: none;
+    min-height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-cabecera { position: sticky; top: 0; background: var(--panel); z-index: 2; }
+  .modal-cuerpo { flex: 1; }
+  .modal-pie { position: sticky; bottom: 0; }
+  .modal-pie .btn { flex: 1; min-height: var(--tactil); font-size: 13.5px; }
+  .modal-cabecera .btn-icono { min-height: 36px; min-width: 36px; }
+}
+
 /* ==========================================================
    Vacio y errores
    ========================================================== */
-.vacio { padding: 46px 20px; text-align: center; color: var(--tinta-tenue); }
+.vacio { padding: 42px 20px; text-align: center; color: var(--tinta-tenue); }
 .vacio strong { display: block; color: var(--tinta); margin-bottom: 4px; font-size: 14px; }
 
 .error-form {
@@ -321,4 +407,13 @@ table.tabla tbody .col-acciones .btn:focus-visible { opacity: 1; }
   font-size: 11.5px;
   color: var(--tinta-tenue);
   font-family: var(--fuente-mono);
+}
+
+@media (max-width: 760px) {
+  .barra-herramientas { gap: 7px; padding: 9px 10px; }
+  .barra-herramientas .campo { flex: 1 1 44%; min-width: 0; }
+  .barra-herramientas .buscador { flex: 1 1 100%; }
+  .barra-herramientas .campo select,
+  .barra-herramientas .campo input { min-height: 36px; font-size: 16px; }
+  .barra-herramientas .conteo { flex: 1 1 100%; margin: 0; text-align: right; }
 }

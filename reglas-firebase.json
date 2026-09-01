@@ -1,0 +1,80 @@
+{
+  "rules": {
+    "config": {
+      "sistema": {
+        ".read": true,
+        ".write": "auth != null && !data.exists() && root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'"
+      }
+    },
+
+    "cuencas": {
+      ".read": "auth != null",
+      ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'"
+    },
+
+    "bases": {
+      ".read": "auth != null",
+      ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'",
+      ".indexOn": ["cuencaId", "orden"]
+    },
+
+    "categorias": {
+      ".read": "auth != null",
+      ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'",
+      ".indexOn": ["orden"]
+    },
+
+    "usuarios": {
+      ".read": "auth != null",
+      ".indexOn": ["rol", "email", "activo"],
+      "$uid": {
+        ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || (auth.uid === $uid && !root.child('config').child('sistema').exists() && newData.child('rol').val() === 'admin')",
+        "rol": {
+          ".validate": "newData.val() === 'admin' || newData.val() === 'editor' || newData.val() === 'operador'"
+        },
+        "ultimoIngreso": {
+          ".write": "auth.uid === $uid || root.child('usuarios').child(auth.uid).child('rol').val() === 'admin'"
+        }
+      }
+    },
+
+    "tareas": {
+      ".read": "auth != null",
+      ".indexOn": ["baseId", "estado", "creadaEn", "ultimaActividad", "vencimiento"],
+      "$tareaId": {
+        ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor'",
+
+        "estado": {
+          ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor' || root.child('tareas').child($tareaId).child('asignados').child(auth.uid).val() === true",
+          ".validate": "newData.val() === 'pendiente' || newData.val() === 'en_curso' || newData.val() === 'en_espera' || newData.val() === 'finalizada' || newData.val() === 'cancelada'"
+        },
+        "ultimaActividad": {
+          ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor' || root.child('tareas').child($tareaId).child('asignados').child(auth.uid).val() === true"
+        },
+        "cerradaEn": {
+          ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor' || root.child('tareas').child($tareaId).child('asignados').child(auth.uid).val() === true"
+        }
+      }
+    },
+
+    "avances": {
+      "$tareaId": {
+        ".read": "auth != null",
+        ".write": "!newData.exists() && (root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor')",
+        "$avanceId": {
+          ".write": "auth != null && !data.exists() && newData.exists() && newData.child('autorUid').val() === auth.uid && (root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor' || root.child('tareas').child($tareaId).child('asignados').child(auth.uid).val() === true)",
+          ".validate": "newData.hasChildren(['autorUid', 'creadaEn'])"
+        }
+      }
+    },
+
+    "indices": {
+      "tareasPorUsuario": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor'"
+        }
+      }
+    }
+  }
+}
