@@ -32,6 +32,11 @@
 
 * { box-sizing: border-box; }
 
+/* El atributo hidden tiene que ganarle a cualquier display de clase.
+   Sin esto, .pantalla-carga y .capa-modal (que usan display:flex)
+   siguen visibles aunque se les ponga hidden. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
