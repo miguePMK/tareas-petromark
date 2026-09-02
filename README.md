@@ -158,6 +158,12 @@ propio con contratistas.
   se importa. Las categorias y prioridades desconocidas solo generan un aviso.
 - Fechas aceptadas: `dd/mm/aaaa`, `aaaa-mm-dd` y el numero de serie interno de
   Excel.
+- **Fecha de creacion:** se puede traer de la planilla (alias reconocidos:
+  "fecha de creacion", "f. inicio", "alta", entre otros). Es el unico camino
+  para fijarla: en el formulario manual la pone el servidor. Se rechazan las
+  fechas futuras. La fecha se guarda al mediodia, para que ningun corrimiento
+  de zona horaria mueva la tarea al dia anterior. La marca del avance inicial
+  y, si la tarea entra cerrada, la de cierre, usan la misma fecha.
 - Se marcan como repetidas las tareas con el mismo titulo en la misma base, ya
   sea contra lo que hay cargado o dentro de la misma planilla.
 - Cada tarea importada queda con un avance automatico que indica el archivo y

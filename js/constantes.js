@@ -100,6 +100,8 @@ export const ENCABEZADOS_CONOCIDOS = {
   prioridad: ['prioridad', 'urgencia'],
   estado: ['estado', 'situacion', 'avance'],
   categoriaId: ['categoria', 'rubro', 'tipo'],
+  creadaEn: ['fecha de creacion', 'fecha creacion', 'creada', 'fecha de alta', 'alta',
+             'fecha inicio', 'fecha de inicio', 'f. inicio', 'inicio', 'fecha pedido'],
   vencimiento: ['vencimiento', 'fecha fin', 'f. fin', 'fecha limite', 'plazo', 'entrega'],
   descripcion: ['observaciones', 'observacion', 'notas', 'comentarios', 'detalle adicional']
 };
