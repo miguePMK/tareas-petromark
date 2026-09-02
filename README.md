@@ -114,6 +114,21 @@ de los tres roles.
 - **Detalle:** ficha, bitacora de avances y registro de nuevos avances.
 - **Bases, Usuarios, Categorias, Externos:** ABM, solo administrador.
 
+### Alcance por base
+
+El campo "bases" del perfil limita en que bases el usuario puede **crear y
+editar** tareas. No limita lo que ve: el listado sigue mostrando todas.
+
+- El administrador alcanza siempre a todas las bases.
+- Si un usuario no tiene ninguna base marcada, se interpreta como sin
+  restriccion. Asi la limitacion se activa recien cuando se le asignan bases.
+- Al editar una tarea de una base fuera del alcance, esa base se mantiene en el
+  selector bajo el grupo "Fuera de tu alcance": se puede guardar sin moverla,
+  pero no reasignarla a otra base ajena.
+- El recorte esta tambien en las reglas de la base, en el `.validate` de
+  `tareas/$tareaId/baseId`. Sin eso, alcanzaria con la consola del navegador
+  para saltearlo.
+
 ### Internos y externos
 
 Una tarea distingue dos roles:

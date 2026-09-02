@@ -47,12 +47,31 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     maxlength: 80
   });
 
+  /* Solo las bases donde esta persona puede trabajar */
+  const basesPermitidas = almacen.basesPermitidas(usuario, true);
+  const recortado = almacen.tieneBasesRecortadas(usuario);
+
+  /* Si se edita una tarea de una base fuera del alcance, esa base se
+     mantiene en la lista para no perderla al guardar. */
+  const opcionesBase = almacen.opcionesBasesPara(usuario, true);
+  if (tarea && tarea.baseId && !basesPermitidas.some(b => b.id === tarea.baseId)) {
+    const suya = almacen.basePorId[tarea.baseId];
+    if (suya) {
+      opcionesBase.push({
+        valor: suya.id,
+        texto: `${suya.codigo} - ${suya.nombre}`,
+        grupo: 'Fuera de tu alcance'
+      });
+    }
+  }
+
   const base = campoSelector({
     etiqueta: 'Base',
     nombre: 'baseId',
-    opciones: almacen.opcionesBases(true),
-    valor: tarea ? tarea.baseId : '',
-    vacio: 'Elegir base'
+    opciones: opcionesBase,
+    valor: tarea ? tarea.baseId : (opcionesBase.length === 1 ? opcionesBase[0].valor : ''),
+    vacio: opcionesBase.length === 1 ? null : 'Elegir base',
+    ayuda: recortado ? 'Solo figuran las bases que tenes asignadas.' : null
   });
 
   const categoria = campoSelector({
@@ -120,6 +139,9 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
 
   const cuerpo = el('div', {}, [
     zonaError,
+    !opcionesBase.length
+      ? bloqueError('No tenes ninguna base asignada con la que trabajar. Pedile a un administrador que te asigne al menos una.')
+      : null,
     el('div.form-tarea', {}, [
       titulo.nodo,
       descripcion.nodo,
@@ -135,6 +157,8 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     ])
   ]);
 
+  if (!opcionesBase.length) botonGuardar.disabled = true;
+
   botonGuardar.addEventListener('click', async () => {
     vaciar(zonaError);
 
@@ -144,6 +168,11 @@ export function abrirFormularioTarea(ctx, tarea, alGuardar) {
     }
     if (!base.valor()) {
       zonaError.appendChild(bloqueError('Elegi una base.'));
+      return;
+    }
+    const permitida = opcionesBase.some(o => o.valor === base.valor());
+    if (!permitida) {
+      zonaError.appendChild(bloqueError('No tenes permiso para cargar tareas en esa base.'));
       return;
     }
     const seleccion = asignados.valor();

@@ -82,7 +82,7 @@ export function montarVistaUsuarios(contenedor, ctx) {
         grupo: (almacen.cuencaPorId[b.cuencaId] || {}).codigo || ''
       })),
       seleccionados: destino ? clavesActivas(destino.bases) : [],
-      ayuda: 'Referencia de a que bases pertenece la persona. El editor ve todas las tareas de todas formas.'
+      ayuda: 'Limita en que bases puede crear y editar tareas. Si no marcas ninguna, puede trabajar en todas. Las tareas de las demas bases las sigue viendo: el recorte es para cargar, no para consultar.'
     });
 
     const activo = campoCasillas({

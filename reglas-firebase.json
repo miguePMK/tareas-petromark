@@ -50,6 +50,10 @@
       "$tareaId": {
         ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor'",
 
+        "baseId": {
+          ".validate": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || !root.child('usuarios').child(auth.uid).child('bases').exists() || root.child('usuarios').child(auth.uid).child('bases').child(newData.val()).val() === true || newData.val() === data.val()"
+        },
+
         "estado": {
           ".write": "root.child('usuarios').child(auth.uid).child('rol').val() === 'admin' || root.child('usuarios').child(auth.uid).child('rol').val() === 'editor' || root.child('tareas').child($tareaId).child('asignados').child(auth.uid).val() === true",
           ".validate": "newData.val() === 'pendiente' || newData.val() === 'en_curso' || newData.val() === 'en_espera' || newData.val() === 'finalizada' || newData.val() === 'cancelada'"

@@ -2,7 +2,7 @@
    layout.js - Marco de la aplicacion, navegacion y almacen
    ========================================================== */
 
-import { el, vaciar, rolPorId, iniciales, debounce } from '../util.js';
+import { el, vaciar, rolPorId, iniciales, debounce, clavesActivas } from '../util.js';
 import { NOMBRE_SISTEMA, NOMBRE_EMPRESA, VERSION, ROL } from '../constantes.js';
 import { salir, puedeAdministrar } from '../auth/sesion.js';
 import { avisoError, confirmar } from './componentes.js';
@@ -90,6 +90,40 @@ almacen.opcionesBases = function (soloActivas = true) {
       texto: `${b.codigo} - ${b.nombre}`,
       grupo: (almacen.cuencaPorId[b.cuencaId] || {}).nombre || 'Sin cuenca'
     }));
+};
+
+/**
+ * Bases donde el usuario puede crear o editar tareas.
+ *
+ * El administrador siempre alcanza a todas. Para el resto manda el campo
+ * "bases" de su perfil, con una salvedad deliberada: si no tiene ninguna
+ * asignada, se interpreta como sin restriccion. De esa forma la limitacion
+ * se activa recien cuando alguien le asigna bases, y los usuarios ya
+ * cargados no quedan sin poder trabajar.
+ */
+almacen.basesPermitidas = function (usuario, soloActivas = true) {
+  const disponibles = almacen.bases.filter(b => (soloActivas ? b.activa !== false : true));
+  if (!usuario) return [];
+  if (usuario.rol === ROL.ADMIN) return disponibles;
+
+  const asignadas = clavesActivas(usuario.bases);
+  if (!asignadas.length) return disponibles;
+  return disponibles.filter(b => asignadas.includes(b.id));
+};
+
+/** True si el usuario tiene el alcance recortado a algunas bases. */
+almacen.tieneBasesRecortadas = function (usuario) {
+  if (!usuario || usuario.rol === ROL.ADMIN) return false;
+  return clavesActivas(usuario.bases).length > 0;
+};
+
+/** Opciones para los selectores, ya filtradas por permiso. */
+almacen.opcionesBasesPara = function (usuario, soloActivas = true) {
+  return almacen.basesPermitidas(usuario, soloActivas).map(b => ({
+    valor: b.id,
+    texto: `${b.codigo} - ${b.nombre}`,
+    grupo: (almacen.cuencaPorId[b.cuencaId] || {}).nombre || 'Sin cuenca'
+  }));
 };
 
 almacen.operadores = function () {
