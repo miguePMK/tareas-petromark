@@ -556,3 +556,208 @@
   border-top: 1px solid var(--borde);
 }
 .separador-campos .campo { margin-bottom: 0; max-width: 420px; }
+
+/* ==========================================================
+   Informes
+   ========================================================== */
+.bloque-informe { margin-bottom: 12px; }
+.bloque-informe .panel-titulo .aclaracion {
+  font-size: 11.5px;
+  color: var(--tinta-tenue);
+  font-weight: 400;
+}
+.bloque-informe h3 {
+  font-size: 12px;
+  color: var(--tinta-tenue);
+  font-weight: 600;
+  margin: 0 0 7px;
+}
+.sub-bloque {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+}
+.dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0 20px;
+}
+.nota-informe {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: var(--tinta-tenue);
+  max-width: 78ch;
+}
+.sin-datos { margin: 6px 0 0; color: var(--tinta-tenue); font-size: 12.5px; }
+
+/* ---------- Cifras ---------- */
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 10px;
+}
+.cifras-cabecera { margin-bottom: 14px; }
+.cifra { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cifra .v { font-size: 22px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cifra .e { font-size: 11.5px; color: var(--tinta-media); }
+.cifra .d { font-size: 10.5px; color: var(--tinta-tenue); }
+
+.fila-indicadores {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.fila-indicadores .cifras { flex: 1; min-width: 240px; }
+
+/* ---------- Dona ---------- */
+.dona { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 0 0 auto; }
+.dona-titulo { font-size: 11.5px; color: var(--tinta-media); font-weight: 600; }
+.dona-leyenda { font-size: 11px; color: var(--tinta-tenue); }
+
+/* ---------- Barras horizontales ---------- */
+.barras { display: flex; flex-direction: column; gap: 4px; }
+.barra-fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 2px 0;
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+}
+button.barra-fila { cursor: pointer; border-radius: var(--radio); }
+button.barra-fila:hover { background: var(--acento-tinte); }
+.barra-etiqueta {
+  flex: 0 0 152px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.barra-canal {
+  flex: 1;
+  min-width: 40px;
+  height: 16px;
+  background: var(--panel-tenue);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.barra-relleno {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+  display: flex;
+  justify-content: flex-end;
+  transition: width 0.25s ease;
+}
+.barra-abiertas { display: block; height: 100%; background: rgba(255, 255, 255, 0.55); }
+.barra-valor {
+  flex: 0 0 46px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.barras-leyenda {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  font-size: 11px;
+  color: var(--tinta-tenue);
+}
+.barras-leyenda span + span { margin-right: 6px; }
+.muestra-llena, .muestra-clara {
+  width: 11px; height: 11px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.muestra-llena { background: var(--acento); }
+.muestra-clara { background: var(--acento); opacity: 0.42; }
+.muestra-linea {
+  width: 14px; height: 2px;
+  background: #B87503;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+/* ---------- Barra por tramos ---------- */
+.barra-tramos {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--borde);
+}
+.barra-tramos span { display: block; height: 100%; }
+.leyenda-tramos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+.item-leyenda {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  color: var(--tinta-media);
+}
+button.item-leyenda { cursor: pointer; }
+.item-leyenda .punto { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.item-leyenda .n { font-weight: 700; color: var(--tinta); font-variant-numeric: tabular-nums; }
+
+/* ---------- Grafico de evolucion ---------- */
+.grafico-marco { width: 100%; overflow-x: auto; }
+.grafico-marco svg { width: 100%; min-width: 460px; height: auto; display: block; }
+
+/* ---------- Listas dentro del informe ---------- */
+.lista-informe { display: flex; flex-direction: column; }
+.fila-informe {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #EDF1F4;
+  font-family: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.fila-informe:last-child { border-bottom: 0; }
+.fila-informe:hover { background: var(--acento-tinte); }
+.fila-informe .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fila-informe .b {
+  flex: 0 0 auto;
+  font-family: var(--fuente-mono);
+  font-size: 11px;
+  color: var(--tinta-tenue);
+}
+.fila-informe .d {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--tinta-media);
+}
+
+@media (max-width: 760px) {
+  .fila-indicadores { gap: 14px; }
+  .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cifra .v { font-size: 19px; }
+  .barra-etiqueta { flex: 0 0 96px; font-size: 12px; }
+  .barra-valor { flex: 0 0 38px; }
+  .dos-columnas { gap: 0; }
+  .bloque-informe .segmentado { width: 100%; overflow-x: auto; }
+}

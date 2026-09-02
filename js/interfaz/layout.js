@@ -4,7 +4,7 @@
 
 import { el, vaciar, rolPorId, iniciales, debounce, clavesActivas } from '../util.js';
 import { NOMBRE_SISTEMA, NOMBRE_EMPRESA, VERSION, ROL } from '../constantes.js';
-import { salir, puedeAdministrar } from '../auth/sesion.js';
+import { salir, puedeAdministrar, puedeGestionarTareas } from '../auth/sesion.js';
 import { avisoError, confirmar } from './componentes.js';
 
 import * as repoBases from '../datos/repoBases.js';
@@ -17,6 +17,7 @@ import { montarVistaDetalle } from './vistaDetalle.js';
 import { montarVistaBases } from './vistaBases.js';
 import { montarVistaUsuarios } from './vistaUsuarios.js';
 import { montarVistaCategorias } from './vistaCategorias.js';
+import { montarVistaInformes } from './vistaInformes.js';
 import { montarVistaExternos } from './vistaExternos.js';
 import { montarVistaImportar } from './vistaImportar.js';
 
@@ -151,6 +152,7 @@ let desuscripciones = [];
 const VISTAS = {
   tareas: { titulo: 'Tareas', montar: montarVistaTareas, admin: false },
   detalle: { titulo: 'Detalle de tarea', montar: montarVistaDetalle, admin: false, oculta: true },
+  informes: { titulo: 'Informes', montar: montarVistaInformes, admin: false, gestion: true },
   bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
   usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
   categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true },
@@ -230,6 +232,7 @@ function dibujarNav(usuario) {
   };
 
   agregar('tareas');
+  if (puedeGestionarTareas(usuario)) agregar('informes');
 
   if (puedeAdministrar(usuario)) {
     navNodo.appendChild(el('div.separador', { texto: 'Administracion' }));
@@ -298,6 +301,10 @@ export function ir(nombre, params = {}) {
 
   const usuario = ctxBase().usuario;
   if (def.admin && !puedeAdministrar(usuario)) {
+    avisoError('No tenes permisos para esa seccion.');
+    return;
+  }
+  if (def.gestion && !puedeGestionarTareas(usuario)) {
     avisoError('No tenes permisos para esa seccion.');
     return;
   }

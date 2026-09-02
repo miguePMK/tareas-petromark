@@ -28,10 +28,12 @@ js/
     sesion.js             login, observador, bootstrap del primer admin
   datos/                  repositorios (interfaz async, sin UI)
     repoBases.js  repoCategorias.js  repoUsuarios.js
-    repoTareas.js  repoAvances.js  repoExternos.js  importador.js
+    repoTareas.js  repoAvances.js  repoExternos.js
+    importador.js  metricas.js
   interfaz/               presentacion (sin logica de negocio)
     componentes.js  login.js  layout.js  formTarea.js
-    tablero.js      vistaTareas.js    vistaDetalle.js
+    tablero.js      graficos.js       vistaTareas.js
+    vistaDetalle.js vistaInformes.js
     vistaBases.js   vistaUsuarios.js  vistaCategorias.js
     vistaExternos.js  vistaImportar.js
 assets/
@@ -112,7 +114,32 @@ de los tres roles.
   navegacion pasa al pie, pensada para el operador que actualiza desde el
   telefono.
 - **Detalle:** ficha, bitacora de avances y registro de nuevos avances.
+- **Informes:** indicadores para auditoria. Administrador y editor.
 - **Bases, Usuarios, Categorias, Externos:** ABM, solo administrador.
+
+### Informes
+
+Seis bloques, todos sujetos a los filtros de periodo, cuenca, base y categoria.
+El periodo recorta por **fecha de creacion**.
+
+- **Cumplimiento de plazos:** compara `cerradaEn` contra `vencimiento`. El
+  vencimiento vence al final del dia. Las finalizadas sin vencimiento no
+  computan, y se informan aparte para que el porcentaje no enganie.
+- **Tiempos de resolucion:** dias entre creacion y cierre. Se muestra mediana
+  ademas de promedio, porque una sola tarea de varios meses corre el promedio.
+- **Antiguedad del backlog:** abiertas en tramos de 7, 30 y 90 dias.
+- **Evolucion mensual:** creadas y cerradas por mes con el pendiente
+  acumulado. El acumulado arranca del saldo anterior al primer mes mostrado,
+  no de cero.
+- **Distribucion de carga:** por base, categoria, prioridad, estado, interno,
+  externo o solicitante.
+- **Trazabilidad:** tareas sin avances, abiertas sin movimiento en 30 dias y
+  cerradas sin comentario. Requiere una lectura completa de `/avances`, que se
+  hace al entrar y con el boton Actualizar.
+
+Los graficos estan dibujados a mano en SVG y CSS. No hay ninguna libreria de
+CDN a proposito: un informe que no carga porque la red bloqueo una descarga es
+peor que uno simple.
 
 ### Alcance por base
 
