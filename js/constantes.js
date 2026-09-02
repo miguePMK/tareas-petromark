@@ -29,6 +29,17 @@ export const CONFIG_FIREBASE = {
 export const VERSION_SDK_FIREBASE = '10.12.5';
 
 /* ----------------------------------------------------------
+   Secciones habilitadas
+   Interruptores para mostrar u ocultar partes del sistema sin
+   tocar el resto del codigo. Poner en true para habilitar.
+   ---------------------------------------------------------- */
+export const SECCIONES = {
+  /* Informes y KPI. Conviene habilitarlo cuando haya suficientes
+     tareas cargadas: con pocos datos los indicadores no dicen nada. */
+  informes: false
+};
+
+/* ----------------------------------------------------------
    Roles
    ---------------------------------------------------------- */
 export const ROL = {
@@ -100,6 +111,8 @@ export const ENCABEZADOS_CONOCIDOS = {
   prioridad: ['prioridad', 'urgencia'],
   estado: ['estado', 'situacion', 'avance'],
   categoriaId: ['categoria', 'rubro', 'tipo'],
+  creadaEn: ['fecha de creacion', 'fecha creacion', 'creada', 'fecha de alta', 'alta',
+             'fecha inicio', 'fecha de inicio', 'f. inicio', 'inicio', 'fecha pedido'],
   vencimiento: ['vencimiento', 'fecha fin', 'f. fin', 'fecha limite', 'plazo', 'entrega'],
   descripcion: ['observaciones', 'observacion', 'notas', 'comentarios', 'detalle adicional']
 };

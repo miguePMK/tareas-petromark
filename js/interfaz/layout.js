@@ -3,7 +3,7 @@
    ========================================================== */
 
 import { el, vaciar, rolPorId, iniciales, debounce, clavesActivas } from '../util.js';
-import { NOMBRE_SISTEMA, NOMBRE_EMPRESA, VERSION, ROL } from '../constantes.js';
+import { NOMBRE_SISTEMA, NOMBRE_EMPRESA, VERSION, ROL, SECCIONES } from '../constantes.js';
 import { salir, puedeAdministrar, puedeGestionarTareas } from '../auth/sesion.js';
 import { avisoError, confirmar } from './componentes.js';
 
@@ -152,7 +152,7 @@ let desuscripciones = [];
 const VISTAS = {
   tareas: { titulo: 'Tareas', montar: montarVistaTareas, admin: false },
   detalle: { titulo: 'Detalle de tarea', montar: montarVistaDetalle, admin: false, oculta: true },
-  informes: { titulo: 'Informes', montar: montarVistaInformes, admin: false, gestion: true },
+  informes: { titulo: 'Informes', montar: montarVistaInformes, admin: false, gestion: true, seccion: 'informes' },
   bases: { titulo: 'Bases', montar: montarVistaBases, admin: true },
   usuarios: { titulo: 'Usuarios y permisos', montar: montarVistaUsuarios, admin: true },
   categorias: { titulo: 'Categorias', montar: montarVistaCategorias, admin: true },
@@ -232,7 +232,7 @@ function dibujarNav(usuario) {
   };
 
   agregar('tareas');
-  if (puedeGestionarTareas(usuario)) agregar('informes');
+  if (puedeGestionarTareas(usuario) && SECCIONES.informes) agregar('informes');
 
   if (puedeAdministrar(usuario)) {
     navNodo.appendChild(el('div.separador', { texto: 'Administracion' }));
@@ -306,6 +306,10 @@ export function ir(nombre, params = {}) {
   }
   if (def.gestion && !puedeGestionarTareas(usuario)) {
     avisoError('No tenes permisos para esa seccion.');
+    return;
+  }
+  if (def.seccion && SECCIONES[def.seccion] === false) {
+    avisoError('Esa seccion esta deshabilitada.');
     return;
   }
 
