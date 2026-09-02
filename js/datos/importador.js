@@ -3,7 +3,7 @@
    Sin dependencias de interfaz: recibe datos, devuelve datos.
    ========================================================== */
 
-import { normalizar, hoyISO } from '../util.js';
+import { normalizar } from '../util.js';
 import {
   ENCABEZADOS_CONOCIDOS, SINONIMOS_ESTADO, SINONIMOS_PRIORIDAD,
   ESTADO, PRIORIDAD_POR_DEFECTO
@@ -147,7 +147,6 @@ export const CAMPOS_IMPORTABLES = [
   { id: 'prioridad', nombre: 'Prioridad', requerido: false },
   { id: 'estado', nombre: 'Estado', requerido: false },
   { id: 'categoriaId', nombre: 'Categoria', requerido: false },
-  { id: 'creadaEn', nombre: 'Fecha de creacion', requerido: false },
   { id: 'vencimiento', nombre: 'Vencimiento', requerido: false },
   { id: 'descripcion', nombre: 'Observaciones', requerido: false }
 ];
@@ -418,28 +417,6 @@ export function interpretar(filas, mapeo, contexto) {
       }
     }
 
-    /* Fecha de creacion.
-       Solo se puede fijar al importar: en el formulario manual la pone
-       el servidor, para que nadie pueda falsear cuando se cargo algo. */
-    const textoCreada = celda(fila, 'creadaEn');
-    if (textoCreada) {
-      try {
-        const iso = fechaDesdeCelda(textoCreada);
-        if (iso) {
-          if (iso > hoyISO()) {
-            errores.push(`la fecha de creacion "${textoCreada}" esta en el futuro`);
-          } else {
-            datos.creadaEn = iso;
-            if (datos.vencimiento && datos.vencimiento < iso) {
-              avisos.push('el vencimiento es anterior a la fecha de creacion');
-            }
-          }
-        }
-      } catch (error) {
-        errores.push(`fecha de creacion "${textoCreada}": ${error.message}`);
-      }
-    }
-
     /* Repetidos */
     let duplicado = false;
     if (datos.baseId && datos.titulo) {
@@ -477,9 +454,9 @@ export function interpretar(filas, mapeo, contexto) {
 
 export function generarPlantillaCSV() {
   const filas = [
-    ['BASE OP', 'DESCRIPCION DE TAREA', 'SOLICITANTE', 'RESPONSABLE INTERNO', 'RESPONSABLE', 'PRIORIDAD', 'ESTADO', 'FECHA DE CREACION', 'VENCIMIENTO', 'OBSERVACIONES'],
-    ['CERRO DRAGON', 'Refacciones vestuarios y banos', 'Carlos Garcia', 'Miguel Lopez', 'DELTA', 'ALTA', 'EN PROCESO', '05/03/2026', '30/09/2026', 'Estado al 90%'],
-    ['CO', 'Reponer toner impresora administracion', 'Ana Diaz', 'Miguel Lopez', '', 'MEDIA', 'PENDIENTE', '12/08/2026', '', 'Modelo HP 26A']
+    ['BASE OP', 'DESCRIPCION DE TAREA', 'SOLICITANTE', 'RESPONSABLE INTERNO', 'RESPONSABLE', 'PRIORIDAD', 'ESTADO', 'VENCIMIENTO', 'OBSERVACIONES'],
+    ['CERRO DRAGON', 'Refacciones vestuarios y banos', 'Carlos Garcia', 'Miguel Lopez', 'DELTA', 'ALTA', 'EN PROCESO', '30/09/2026', 'Estado al 90%'],
+    ['CO', 'Reponer toner impresora administracion', 'Ana Diaz', 'Miguel Lopez', '', 'MEDIA', 'PENDIENTE', '', 'Modelo HP 26A']
   ];
   const texto = filas.map(f => f.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\r\n');
   return '\uFEFF' + texto;

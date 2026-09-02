@@ -143,13 +143,6 @@ export async function crearLote(lista, autor, alAvanzar) {
       const estado = datos.estado || ESTADO.PENDIENTE;
       const cerrada = ESTADOS_CIERRE.includes(estado);
 
-      /* Si la planilla trae fecha de creacion, se usa esa en lugar de la
-         del servidor. Se fija al mediodia para que ningun corrimiento de
-         zona horaria mueva la tarea al dia anterior. */
-      const marcaCreacion = datos.creadaEn
-        ? new Date(`${datos.creadaEn}T12:00:00`).getTime()
-        : serverTimestamp();
-
       cambios[`tareas/${id}`] = {
         titulo: datos.titulo.trim(),
         descripcion: (datos.descripcion || '').trim() || null,
@@ -162,9 +155,9 @@ export async function crearLote(lista, autor, alAvanzar) {
         asignados: asignados,
         externos: aMapa(datos.externos),
         creadaPor: autor.uid,
-        creadaEn: marcaCreacion,
-        ultimaActividad: marcaCreacion,
-        cerradaEn: cerrada ? marcaCreacion : null,
+        creadaEn: serverTimestamp(),
+        ultimaActividad: serverTimestamp(),
+        cerradaEn: cerrada ? serverTimestamp() : null,
         importada: true
       };
 
@@ -175,7 +168,7 @@ export async function crearLote(lista, autor, alAvanzar) {
         texto: datos.notaImportacion || 'Tarea cargada por importacion de planilla.',
         estadoAnterior: null,
         estadoNuevo: estado,
-        creadaEn: marcaCreacion
+        creadaEn: serverTimestamp()
       };
 
       for (const uid of clavesActivas(asignados)) {

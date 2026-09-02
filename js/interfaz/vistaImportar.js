@@ -115,8 +115,7 @@ export function montarVistaImportar(contenedor, ctx) {
           el('p', { texto: 'La primera fila de la planilla tiene que ser la de encabezados. Se lee la primera hoja.' }),
           el('p', { texto: 'Las columnas se detectan solas por su nombre, y en el paso siguiente podes corregir cualquiera.' }),
           el('p', { texto: 'Las bases, los internos y los externos tienen que existir ya en el sistema: si no, la fila se marca con error y no se importa.' }),
-          el('p', { texto: 'Si en la columna de responsable figuran contratistas, mapeala a "Ejecuta (externo)" y cargalos antes en la seccion Externos.' }),
-          el('p', { texto: 'La fecha de creacion se puede traer de la planilla. Las filas que no la traigan quedan con la fecha de hoy.' })
+          el('p', { texto: 'Si en la columna de responsable figuran contratistas, mapeala a "Ejecuta (externo)" y cargalos antes en la seccion Externos.' })
         ])
       ])
     );
@@ -352,10 +351,6 @@ export function montarVistaImportar(contenedor, ctx) {
           ]),
           el('td', { texto: r.datos.prioridad ? prioridadPorId(r.datos.prioridad).nombre : '' }),
           el('td', { texto: r.datos.estado ? estadoPorId(r.datos.estado).nombre : '' }),
-          el('td', {
-            texto: r.datos.creadaEn ? fechaCorta(r.datos.creadaEn) : 'hoy',
-            clase: r.datos.creadaEn ? '' : 'secundario'
-          }),
           el('td', { texto: r.datos.vencimiento ? fechaCorta(r.datos.vencimiento) : '' }),
           el('td', {}, [
             !r.valida
@@ -395,7 +390,6 @@ export function montarVistaImportar(contenedor, ctx) {
                 el('th', { texto: 'Responsables' }),
                 el('th', { texto: 'Prioridad' }),
                 el('th', { texto: 'Estado' }),
-                el('th', { texto: 'Creada' }),
                 el('th', { texto: 'Vence' }),
                 el('th', { texto: '' })
               ])
